@@ -1,11 +1,9 @@
 package com.github.sisyphsu.dateparser;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.DateTimeException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -16,10 +14,12 @@ import java.util.TimeZone;
  * @author sulin
  * @since 2019-09-12 14:58:15
  */
-@Data
+@Getter
+@Setter
 public final class DateBuilder {
 
     private static final ZoneOffset SYSTEM_ZONE_OFFSET = OffsetDateTime.now().getOffset();
+    private static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
 
     int week;
     int year;
@@ -127,7 +127,11 @@ public final class DateBuilder {
      * Convert this instance into OffsetDateTime
      */
     OffsetDateTime toOffsetDateTime() {
-        LocalDateTime dateTime = this.buildDateTime();
+        this.prepare();
+        if (unixsecond > 0) {
+            return OffsetDateTime.ofInstant(Instant.ofEpochSecond(unixsecond, ns), UTC_ZONE_ID);
+        }
+        LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second, ns);
         // with ZoneOffset
         if (zoneOffsetSetted) {
             ZoneOffset offset = ZoneOffset.ofHoursMinutes(zoneOffset / 60, zoneOffset % 60);
@@ -139,17 +143,6 @@ public final class DateBuilder {
         }
         // with default
         return dateTime.atZone(ZoneOffset.ofHoursMinutes(0, 0)).toOffsetDateTime();
-    }
-
-    /**
-     * Build a LocaDateTime instance, didn't handle TimeZone.
-     */
-    private LocalDateTime buildDateTime() {
-        this.prepare();
-        if (unixsecond > 0) {
-            return LocalDateTime.ofEpochSecond(unixsecond, ns, ZoneOffset.UTC);
-        }
-        return LocalDateTime.of(year, month, day, hour, minute, second, ns);
     }
 
     /**

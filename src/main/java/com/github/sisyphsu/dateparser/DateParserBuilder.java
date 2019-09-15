@@ -101,11 +101,14 @@ public final class DateParserBuilder {
         // at hh:mm:ss.SSSSZ
         register("\\W*(?:at )?(?<hour>\\d{1,2}):(?<minute>\\d{1,2})(?::(?<second>\\d{1,2}))?(?:[.,](?<ns>\\d{1,9}))?(?<zero>z)?");
 
-        // am, pm
-        register(" ?(?<m>am|pm)");
-
         // +08:00
         register(" ?(?<zoneOffset>[-+]\\d{2}:?(?:\\d{2})?)");
+
+        // 12 o’clock
+        register(" ?(?<hour>\\d{1,2}) o’clock\\W*");
+
+        // am, pm
+        register(" ?(?<m>am|pm)\\W*");
 
         // (CEST) (GMT Daylight Time)
         register(" [(](?<zoneName>\\w+(?: \\w+)*)[)]");
@@ -115,12 +118,14 @@ public final class DateParserBuilder {
             final TimeZone zone = TimeZone.getTimeZone(zoneId);
             final RuleHandler handler = (cs, matcher, dt) -> dt.zone = zone;
 
-            register(String.format(" \\Q%s\\E", zone.getID().toLowerCase()), handler);
+            String zoneIdStr = zone.getID().toLowerCase();
+            register(String.format(" ?\\Q%s\\E", zoneIdStr), handler);
+            register(String.format(" ?\\Q[%s]\\E", zoneIdStr), handler);
         }
 
         // support others no-standard 'timezone'
-        register(" pdt", (cs, matcher, dt) -> dt.zone = TimeZone.getTimeZone("America/Los_Angeles"));
-        register(" cest", (cs, matcher, dt) -> dt.zone = TimeZone.getTimeZone("CET"));
+        register(" ?pdt", (cs, matcher, dt) -> dt.zone = TimeZone.getTimeZone("PST"));
+        register(" ?cest", (cs, matcher, dt) -> dt.zone = TimeZone.getTimeZone("CET"));
 
         // MSK m=+0.000000001
         register(" msk m=[+-]\\d\\.\\d+");
