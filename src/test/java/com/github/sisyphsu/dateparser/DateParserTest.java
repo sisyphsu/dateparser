@@ -20,7 +20,7 @@ public class DateParserTest {
         OffsetDateTime dateTime = parser.parseOffsetDateTime("12 o’clock PM, PDT");
         assert dateTime.getHour() == 12;
 
-        dateTime = parser.parseOffsetDateTime("0:08 PM, PDT");
+        dateTime = parser.parseOffsetDateTime("0:08 PM, CEST");
         assert dateTime.getHour() == 12;
         assert dateTime.getMinute() == 8;
 
@@ -30,6 +30,18 @@ public class DateParserTest {
         assert dateTime.getDayOfMonth() == 16;
         assert dateTime.getHour() == 8;
         assert dateTime.getOffset().getTotalSeconds() == 0;
+    }
+
+    @Test
+    public void testCharArray() {
+        DateParser.CharArray array = new DateParser.CharArray(new char[0]);
+        assert array.length() == 0;
+        try {
+            array.subSequence(0, 0);
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof UnsupportedOperationException;
+        }
     }
 
     @Test
@@ -119,6 +131,7 @@ public class DateParserTest {
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-01-01 00:00:00 +0000", "2014");
         assert match("yyyy-MM-dd HH:mm:ss.SSS Z", "2014-05-11 08:20:13.787 +0000", "2014-05-11 08:20:13,787");
 
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-31 00:00:00 +0000", "3。31.2014");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-31 00:00:00 +0000", "3.31.2014");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-31 00:00:00 +0000", "03.31.2014");
         assert match("yyyy-MM-dd HH:mm:ss Z", "1971-08-21 00:00:00 +0000", "08.21.71");

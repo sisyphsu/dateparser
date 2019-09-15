@@ -11,7 +11,6 @@ import java.util.*;
 public final class DateParserBuilder {
 
     static final String[] months = {
-            "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
             "january",
             "february",
             "march",
@@ -24,9 +23,9 @@ public final class DateParserBuilder {
             "october",
             "november",
             "december",
+            "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
     };
     static final String[] weeks = {
-            "mon", "tue", "wed", "thu", "fri", "sat", "sun",
             "monday",
             "tuesday",
             "wednesday",
@@ -34,6 +33,7 @@ public final class DateParserBuilder {
             "friday",
             "saturday",
             "sunday",
+            "mon", "tue", "wed", "thu", "fri", "sat", "sun",
     };
 
     static final List<String> STANDARD_RULES = new ArrayList<>();
@@ -44,7 +44,7 @@ public final class DateParserBuilder {
     static {
         // support day of week, like 'Mon' or 'Monday,'
         for (String week : weeks) {
-            register(String.format("(?<week>%s)\\W+", week));
+            register(String.format("(?<week>%s)\\W*", week));
         }
 
         for (String month : months) {
@@ -52,13 +52,13 @@ public final class DateParserBuilder {
             register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W+(?<year>\\d{4})\\b", month));
             register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W+(?<year>\\d{2})$", month));
             register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W+(?<year>\\d{2})[^:\\d]", month));
-            register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W+", month));
+            register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W*", month));
 
             // month-word at middle, like '8th, may, 2009,' or '8th-may-09'
             register(String.format("(?<day>\\d{1,2})(?:th)?\\W+(?<month>%s)\\W+(?<year>\\d{4})\\b", month));
             register(String.format("(?<day>\\d{1,2})(?:th)?\\W+(?<month>%s)\\W+(?<year>\\d{2})$", month));
             register(String.format("(?<day>\\d{1,2})(?:th)?\\W+(?<month>%s)\\W+(?<year>\\d{2})[^:\\d]", month));
-            register(String.format("(?<day>\\d{1,2})(?:th)?\\W+(?<month>%s)\\W+", month));
+            register(String.format("(?<day>\\d{1,2})(?:th)?\\W+(?<month>%s)\\W*", month));
 
             // month-word at middle, like '2009-may-8th'
             register(String.format("(?<year>\\d{4})\\W+(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W*", month));

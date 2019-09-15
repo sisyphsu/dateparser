@@ -13,6 +13,9 @@ import java.util.Date;
  */
 public final class DateParserUtils {
 
+    private DateParserUtils() {
+    }
+
     private static final DateParserBuilder builder = DateParser.newBuilder();
     private static DateParser dateParser = builder.build();
 

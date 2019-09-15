@@ -113,106 +113,118 @@ public final class DateParser {
     private void parse(final CharArray input) {
         matcher.reset(input);
         int offset = 0;
+        int oldEnd = -1;
         while (matcher.find(offset)) {
+            if (oldEnd == matcher.end()) {
+                throw error(offset, "empty matching at " + offset);
+            }
             if (standardRules.contains(matcher.re())) {
-                for (int index = 1; index <= matcher.groupCount(); index++) {
-                    final String groupName = matcher.groupName(index);
-                    final int startOff = matcher.start(index);
-                    final int endOff = matcher.end(index);
-                    if (groupName == null) {
-                        throw error(offset, "Hit invalid standard rule: " + matcher.re());
-                    }
-                    switch (groupName) {
-                        case "week":
-                            dt.week = parseWeek(input, startOff);
-                            break;
-                        case "year":
-                            dt.year = parseYear(input, startOff, endOff);
-                            break;
-                        case "month":
-                            dt.month = parseMonth(input, startOff, endOff);
-                            if (dt.month <= 0 || dt.month > 12) {
-                                throw error(startOff, "Invalid month at " + startOff);
-                            }
-                            break;
-                        case "day":
-                            dt.day = parseNum(input, startOff, endOff);
-                            if (dt.day <= 0 || dt.day > 31) {
-                                throw error(startOff, "Invalid day at " + startOff);
-                            }
-                            break;
-                        case "hour":
-                            dt.hour = parseNum(input, startOff, endOff);
-                            if (dt.hour < 0 || dt.hour >= 24) {
-                                throw error(startOff, "Invalid hour at " + startOff);
-                            }
-                            break;
-                        case "minute":
-                            dt.minute = parseNum(input, startOff, endOff);
-                            if (dt.minute < 0 || dt.minute >= 60) {
-                                throw error(startOff, "Invalid minute at " + startOff);
-                            }
-                            break;
-                        case "second":
-                            dt.second = parseNum(input, startOff, endOff);
-                            if (dt.second < 0 || dt.second >= 60) {
-                                throw error(startOff, "Invalid second at " + startOff);
-                            }
-                            break;
-                        case "ns":
-                            dt.ns = parseNano(input, startOff, endOff);
-                            break;
-                        case "m":
-                            if (input.charAt(startOff) == 'p') {
-                                dt.pm = true;
-                            } else {
-                                dt.am = true;
-                            }
-                            break;
-                        case "zero":
-                            dt.zoneOffsetSetted = true;
-                            dt.zoneOffset = 0;
-                            break;
-                        case "zoneOffset":
-                            dt.zoneOffsetSetted = true;
-                            dt.zoneOffset = parseZoneOffset(input, startOff, endOff);
-                            if (dt.zoneOffset < -720 || dt.zoneOffset > 720) {
-                                throw error(startOff, "Invalid ZoneOffset at " + startOff);
-                            }
-                            break;
-                        case "zoneName":
-                            // don't support by now
-                            break;
-                        case "dayOrMonth":
-                            parseDayOrMonth(input, startOff, endOff);
-                            break;
-                        case "unixsecond":
-                            dt.unixsecond = parseNum(input, startOff, startOff + 10);
-                            break;
-                        case "millisecond":
-                            dt.unixsecond = parseNum(input, startOff, startOff + 10);
-                            dt.ns = parseNum(input, startOff + 10, endOff) * 1000000;
-                            break;
-                        case "microsecond":
-                            dt.unixsecond = parseNum(input, startOff, startOff + 10);
-                            dt.ns = parseNum(input, startOff + 10, endOff) * 1000;
-                            break;
-                        case "nanosecond":
-                            dt.unixsecond = parseNum(input, startOff, startOff + 10);
-                            dt.ns = parseNum(input, startOff + 10, endOff);
-                            break;
-                        default:
-                            throw error(offset, "Hit invalid standard rule: " + matcher.re());
-                    }
-                }
+                this.parseStandard(input, offset);
             } else {
                 RuleHandler handler = customizedRuleMap.get(matcher.re());
                 handler.handle(input, matcher, dt);
             }
             offset = matcher.end();
+            oldEnd = offset;
         }
         if (offset != input.length()) {
             throw error(offset);
+        }
+    }
+
+    /**
+     * Parse datetime use standard rules.
+     */
+    void parseStandard(CharArray input, int offset) {
+        for (int index = 1; index <= matcher.groupCount(); index++) {
+            final String groupName = matcher.groupName(index);
+            final int startOff = matcher.start(index);
+            final int endOff = matcher.end(index);
+            if (groupName == null) {
+                throw error(offset, "Hit invalid standard rule: " + matcher.re());
+            }
+            switch (groupName) {
+                case "week":
+                    dt.week = parseWeek(input, startOff);
+                    break;
+                case "year":
+                    dt.year = parseYear(input, startOff, endOff);
+                    break;
+                case "month":
+                    dt.month = parseMonth(input, startOff, endOff);
+                    if (dt.month <= 0 || dt.month > 12) {
+                        throw error(startOff, "Invalid month at " + startOff);
+                    }
+                    break;
+                case "day":
+                    dt.day = parseNum(input, startOff, endOff);
+                    if (dt.day <= 0 || dt.day > 31) {
+                        throw error(startOff, "Invalid day at " + startOff);
+                    }
+                    break;
+                case "hour":
+                    dt.hour = parseNum(input, startOff, endOff);
+                    if (dt.hour >= 24) {
+                        throw error(startOff, "Invalid hour at " + startOff);
+                    }
+                    break;
+                case "minute":
+                    dt.minute = parseNum(input, startOff, endOff);
+                    if (dt.minute >= 60) {
+                        throw error(startOff, "Invalid minute at " + startOff);
+                    }
+                    break;
+                case "second":
+                    dt.second = parseNum(input, startOff, endOff);
+                    if (dt.second >= 60) {
+                        throw error(startOff, "Invalid second at " + startOff);
+                    }
+                    break;
+                case "ns":
+                    dt.ns = parseNano(input, startOff, endOff);
+                    break;
+                case "m":
+                    if (input.charAt(startOff) == 'p') {
+                        dt.pm = true;
+                    } else {
+                        dt.am = true;
+                    }
+                    break;
+                case "zero":
+                    dt.zoneOffsetSetted = true;
+                    dt.zoneOffset = 0;
+                    break;
+                case "zoneOffset":
+                    dt.zoneOffsetSetted = true;
+                    dt.zoneOffset = parseZoneOffset(input, startOff, endOff);
+                    if (dt.zoneOffset < -720 || dt.zoneOffset > 720) {
+                        throw error(startOff, "Invalid ZoneOffset at " + startOff);
+                    }
+                    break;
+                case "zoneName":
+                    // don't support by now
+                    break;
+                case "dayOrMonth":
+                    parseDayOrMonth(input, startOff, endOff);
+                    break;
+                case "unixsecond":
+                    dt.unixsecond = parseNum(input, startOff, startOff + 10);
+                    break;
+                case "millisecond":
+                    dt.unixsecond = parseNum(input, startOff, startOff + 10);
+                    dt.ns = parseNum(input, startOff + 10, endOff) * 1000000;
+                    break;
+                case "microsecond":
+                    dt.unixsecond = parseNum(input, startOff, startOff + 10);
+                    dt.ns = parseNum(input, startOff + 10, endOff) * 1000;
+                    break;
+                case "nanosecond":
+                    dt.unixsecond = parseNum(input, startOff, startOff + 10);
+                    dt.ns = parseNum(input, startOff + 10, endOff);
+                    break;
+                default:
+                    throw error(offset, "Hit invalid standard rule: " + matcher.re());
+            }
         }
     }
 
@@ -306,6 +318,7 @@ public final class DateParser {
                     case 'h':
                         return 4; // thursday
                 }
+                break;
             case 's':
                 switch (input.data[from + 1]) {
                     case 'a':
@@ -313,6 +326,7 @@ public final class DateParser {
                     case 'u':
                         return 7; // sunday
                 }
+                break;
         }
         throw error(from, "Invalid week at " + from);
     }
@@ -326,25 +340,34 @@ public final class DateParser {
         }
         switch (input.data[from]) {
             case 'a':
-                if (input.data[from + 1] == 'p') {
-                    return 4; // april
+                switch (input.data[from + 1]) {
+                    case 'p':
+                        return 4; // april
+                    case 'u':
+                        return 8; // august
                 }
-                return 8; // august
+                break;
             case 'j':
                 if (input.data[from + 1] == 'a') {
                     return 1; // january
                 }
-                if (input.data[from + 2] == 'n') {
-                    return 6; // june
+                switch (input.data[from + 2]) {
+                    case 'n':
+                        return 6; // june
+                    case 'l':
+                        return 7; // july
                 }
-                return 7; // july
+                break;
             case 'f':
                 return 2; // february
             case 'm':
-                if (input.data[from + 2] == 'r') {
-                    return 3; // march
+                switch (input.data[from + 2]) {
+                    case 'r':
+                        return 3; // march
+                    case 'y':
+                        return 5; // may
                 }
-                return 5; // may
+                break;
             case 's':
                 return 9; // september
             case 'o':

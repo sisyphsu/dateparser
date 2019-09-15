@@ -2,6 +2,7 @@ package com.github.sisyphsu.dateparser;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 
 /**
@@ -15,6 +16,10 @@ public class DateParserBuilderTest {
         DateParser parser = DateParser.newBuilder()
                 .preferMonthFirst(true)
                 .addRule("【(?<year>\\d{4})】")
+                .addRule("【(?<year>\\d{4})】") // not work because of repeat
+                .addRule("民国(\\d{3})年", (input, matcher, dt) -> {
+                    // should be replaced
+                })
                 .addRule("民国(\\d{3})年", (input, matcher, dt) -> {
                     int offset = matcher.start(1);
                     int i0 = input.charAt(offset) - '0';
@@ -29,6 +34,30 @@ public class DateParserBuilderTest {
 
         calendar = parser.parseCalendar("民国101年");
         assert calendar.get(Calendar.YEAR) == 2012;
+    }
+
+    @Test
+    public void testInvalidRule() {
+        DateParser parser = DateParser.newBuilder().addRule("(?<invalid>\\d{3})").build();
+        try {
+            parser.parseDate("123");
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof DateTimeParseException;
+        }
+        parser = DateParser.newBuilder().addRule("(\\d{3})").build();
+        try {
+            parser.parseDate("123");
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof DateTimeParseException;
+        }
+        try {
+            DateParserUtils.parseDate("2019-01-10 0000000000");
+            assert false;
+        } catch (Exception e) {
+            assert e instanceof DateTimeParseException;
+        }
     }
 
 }
