@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Complete
+ * This is an convenience utils for {@link DateParser}.
  *
  * @author sulin
  * @since 2019-09-15 11:19:31

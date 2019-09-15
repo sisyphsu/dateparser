@@ -8,7 +8,11 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
- * TODO optimize Exception
+ * DateParser represents an unique parser context, it shouldn't be used concurrently.
+ * <p>
+ * In most cases, datetime's parsing should be very fast, so you can use {@link DateParserUtils} directly.
+ * <p>
+ * If need use it in multiple threads, you can create your own parser by {@link DateParserBuilder}.
  *
  * @author sulin
  * @since 2019-09-12 14:28:50
