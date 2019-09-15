@@ -7,6 +7,8 @@ import java.time.OffsetDateTime;
 import java.util.*;
 
 /**
+ * TODO optimize Exception
+ *
  * @author sulin
  * @since 2019-09-12 14:28:50
  */
@@ -16,7 +18,7 @@ public final class DateParser {
 
     private final ReMatcher matcher;
 
-    private final DateTime dt = new DateTime();
+    private final DateBuilder dt = new DateBuilder();
 
     private final List<String> rules = new ArrayList<>();
     private final Set<String> standardRules = new HashSet<>();
@@ -42,29 +44,55 @@ public final class DateParser {
     }
 
     /**
-     * Parse the specified string into OffsetDateTime
+     * Parse the specified String into Date
      *
-     * @param str The original String
-     * @return OffsetDateTime
+     * @param str The original String like '2019-10-01 00:10:20 +0800'
+     * @return The parsed Date
      */
-    public OffsetDateTime parseOffsetDateTime(String str) {
+    public Date parseDate(String str) {
         this.dt.reset();
         this.str = str;
         this.parse(buildInput(str));
-        return dt.toOffsetDateTime();
+        return dt.toDate();
+    }
+
+    /**
+     * Parse the specified String into Calendar
+     *
+     * @param str The original String like '2019-10-01 00:10:20 +0800'
+     * @return The parsed Calendar
+     */
+    public Calendar parseCalendar(String str) {
+        this.dt.reset();
+        this.str = str;
+        this.parse(buildInput(str));
+        return dt.toCalendar();
     }
 
     /**
      * Parse the specified string into LocalDateTime
      *
      * @param str The original String
-     * @return LocalDateTime
+     * @return The parsed LocalDateTime
      */
-    public LocalDateTime parseLocalDateTime(String str) {
+    public LocalDateTime parseDateTime(String str) {
         this.dt.reset();
         this.str = str;
         this.parse(buildInput(str));
         return dt.toLocalDateTime();
+    }
+
+    /**
+     * Parse the specified string into OffsetDateTime
+     *
+     * @param str The original String
+     * @return The parsed OffsetDateTime
+     */
+    public OffsetDateTime parseOffsetDateTime(String str) {
+        this.dt.reset();
+        this.str = str;
+        this.parse(buildInput(str));
+        return dt.toOffsetDateTime();
     }
 
     /**

@@ -8,7 +8,7 @@ import java.util.*;
  * @author sulin
  * @since 2019-09-12 14:34:29
  */
-public final class Rules {
+final class Rules {
 
     static final String[] months = {
             "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
@@ -126,13 +126,13 @@ public final class Rules {
         register(" msk m=[+-]\\d\\.\\d+");
     }
 
-    public static synchronized void register(String re) {
+    static synchronized void register(String re) {
         if (!STANDARD_RULES.contains(re)) {
             STANDARD_RULES.add(re);
         }
     }
 
-    public static synchronized void register(String re, RuleHandler handler) {
+    static synchronized void register(String re, RuleHandler handler) {
         if (!CUSTOMIZED_RULE_MAP.containsKey(re)) {
             CUSTOMIZED_RULES.add(re);
         }

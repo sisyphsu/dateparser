@@ -18,6 +18,6 @@ public interface RuleHandler {
      * @param to    End offset
      * @param dt    DateTime to accept parsed properties.
      */
-    void handle(CharSequence chars, int from, int to, DateTime dt);
+    void handle(CharSequence chars, int from, int to, DateBuilder dt);
 
 }
