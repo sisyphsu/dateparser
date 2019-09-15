@@ -8,7 +8,7 @@ import java.util.*;
  * @author sulin
  * @since 2019-09-12 14:34:29
  */
-final class Rules {
+public final class DateParserBuilder {
 
     static final String[] months = {
             "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
@@ -137,6 +137,69 @@ final class Rules {
             CUSTOMIZED_RULES.add(re);
         }
         CUSTOMIZED_RULE_MAP.put(re, handler);
+    }
+
+    private boolean preferMonthFirst = false;
+    private final List<String> rules = new ArrayList<>();
+    private final Set<String> standardRules = new HashSet<>();
+    private final Map<String, RuleHandler> customizedRuleMap = new HashMap<>();
+
+    DateParserBuilder() {
+        // predefined standard rules
+        this.rules.addAll(DateParserBuilder.STANDARD_RULES);
+        this.standardRules.addAll(DateParserBuilder.STANDARD_RULES);
+        // predefined customized rules
+        this.rules.addAll(DateParserBuilder.CUSTOMIZED_RULES);
+        this.customizedRuleMap.putAll(DateParserBuilder.CUSTOMIZED_RULE_MAP);
+    }
+
+    /**
+     * Mark this parser prefer mm/dd or not.
+     *
+     * @param preferMonthFirst True means prefer mm/dd, False means prefer dd/mm.
+     * @return This
+     */
+    public DateParserBuilder preferMonthFirst(boolean preferMonthFirst) {
+        this.preferMonthFirst = preferMonthFirst;
+        return this;
+    }
+
+    /**
+     * Add an standard rule which could parse the specified subsequence.
+     *
+     * @param rule Standard rule which should have some specified groupName
+     * @return This
+     */
+    public DateParserBuilder addRule(String rule) {
+        if (!standardRules.contains(rule)) {
+            rules.add(rule);
+            standardRules.add(rule);
+        }
+        return this;
+    }
+
+    /**
+     * Add an customized rule which could parse any subsequence.
+     *
+     * @param rule    The parsing rule in regex
+     * @param handler The parsing callback
+     * @return This
+     */
+    public DateParserBuilder addRule(String rule, RuleHandler handler) {
+        if (!customizedRuleMap.containsKey(rule)) {
+            standardRules.add(rule);
+        }
+        customizedRuleMap.put(rule, handler);
+        return this;
+    }
+
+    /**
+     * Build the final DateParser instance.
+     *
+     * @return DateParser
+     */
+    public DateParser build() {
+        return new DateParser(rules, standardRules, customizedRuleMap, preferMonthFirst);
     }
 
 }

@@ -15,33 +15,40 @@ import java.util.*;
  */
 public final class DateParser {
 
-    private static int[] NSS = {100000000, 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1};
-
     private final ReMatcher matcher;
-
     private final DateBuilder dt = new DateBuilder();
 
-    private final List<String> rules = new ArrayList<>();
-    private final Set<String> standardRules = new HashSet<>();
-    private final Map<String, RuleHandler> customizedRuleMap = new HashMap<>();
+    private final List<String> rules;
+    private final Set<String> standardRules;
+    private final Map<String, RuleHandler> customizedRuleMap;
 
     private String input;
+    private boolean preferMonthFirst;
 
-    private boolean preferMonthFirst = false;
+    DateParser(List<String> rules, Set<String> stdRules, Map<String, RuleHandler> cstRules, boolean preferMonthFirst) {
+        this.rules = rules;
+        this.standardRules = stdRules;
+        this.customizedRuleMap = cstRules;
+        this.preferMonthFirst = preferMonthFirst;
+        this.matcher = new ReMatcher(this.rules.toArray(new String[0]));
+    }
 
-    public DateParser(String... rules) {
-        // predefined standard rules
-        this.rules.addAll(Rules.STANDARD_RULES);
-        this.standardRules.addAll(Rules.STANDARD_RULES);
-        // predefined customized rules
-        this.rules.addAll(Rules.CUSTOMIZED_RULES);
-        this.customizedRuleMap.putAll(Rules.CUSTOMIZED_RULE_MAP);
-        // parameterized rules
-        if (rules != null) {
-            Collections.addAll(this.rules, rules);
-            Collections.addAll(this.standardRules, rules);
-        }
-        matcher = new ReMatcher(this.rules.toArray(new String[0]));
+    /**
+     * Create an new DateParserBuilder which could be used for initialize DateParser.
+     *
+     * @return DateParserBuilder instance
+     */
+    public static DateParserBuilder newBuilder() {
+        return new DateParserBuilder();
+    }
+
+    /**
+     * If parser cannot distinguish the dd/mm and mm/dd, preferMonthFirst will help it determine.
+     *
+     * @param preferMonthFirst Prefer dd/mm or mm/dd
+     */
+    public void setPreferMonthFirst(boolean preferMonthFirst) {
+        this.preferMonthFirst = preferMonthFirst;
     }
 
     /**
@@ -400,4 +407,5 @@ public final class DateParser {
         }
     }
 
+    private static int[] NSS = {100000000, 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1};
 }

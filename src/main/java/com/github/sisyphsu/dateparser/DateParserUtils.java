@@ -13,7 +13,8 @@ import java.util.Date;
  */
 public final class DateParserUtils {
 
-    private static DateParser dateParser = new DateParser();
+    private static final DateParserBuilder builder = DateParser.newBuilder();
+    private static DateParser dateParser = builder.build();
 
     /**
      * Parse the specified String into Date instance, it will convert different TimeZone into system's default zone.
@@ -56,12 +57,22 @@ public final class DateParserUtils {
     }
 
     /**
+     * Setup the current Utils prefer mm/dd or not.
+     *
+     * @param preferMonthFirst Prefer dd/mm or mm/dd
+     */
+    public static synchronized void preferMonthFirst(boolean preferMonthFirst) {
+        dateParser.setPreferMonthFirst(preferMonthFirst);
+    }
+
+    /**
      * Register new standard parse rules, all captured group should have the specified names.
      *
      * @param re The regex of rule
      */
     public static synchronized void registerStandardRule(String re) {
-        Rules.register(re);
+        builder.addRule(re);
+        dateParser = builder.build();
     }
 
     /**
@@ -71,7 +82,8 @@ public final class DateParserUtils {
      * @param handler The handler for this rule
      */
     public static synchronized void registerCustomizedRule(String re, RuleHandler handler) {
-        Rules.register(re, handler);
+        builder.addRule(re, handler);
+        dateParser = builder.build();
     }
 
 }

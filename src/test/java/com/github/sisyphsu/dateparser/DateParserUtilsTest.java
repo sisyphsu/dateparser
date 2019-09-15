@@ -12,9 +12,7 @@ import java.time.format.DateTimeFormatterBuilder;
  * @author sulin
  * @since 2019-09-14 17:06:19
  */
-public class DateParserTest {
-
-    private static final DateParser parser = new DateParser();
+public class DateParserUtilsTest {
 
     @Test
     public void test() {
@@ -121,7 +119,7 @@ public class DateParserTest {
     private boolean match(String format, String datetime, String freeDatetime) {
         DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern(format).toFormatter();
         OffsetDateTime dt1 = OffsetDateTime.parse(datetime, formatter);
-        OffsetDateTime dt2 = parser.parseOffsetDateTime(freeDatetime);
+        OffsetDateTime dt2 = DateParserUtils.parseOffsetDateTime(freeDatetime);
 
         return dt1.equals(dt2);
     }
