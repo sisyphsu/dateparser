@@ -203,7 +203,7 @@ public final class DateParser {
                 }
             } else {
                 RuleHandler handler = customizedRuleMap.get(matcher.re());
-                handler.handle(input, matcher.start(), matcher.end(), dt);
+                handler.handle(input, matcher, dt);
             }
             offset = matcher.end();
         }
@@ -353,10 +353,18 @@ public final class DateParser {
         throw error(from, "Invalid month at " + from);
     }
 
+    private DateTimeParseException error(int offset) {
+        return error(offset, String.format("Text %s cannot parse at %d", input, offset));
+    }
+
+    private DateTimeParseException error(int offset, String msg) {
+        return new DateTimeParseException(msg, input, offset);
+    }
+
     /**
      * Parse an subsequence which represent an number, like '1234'
      */
-    int parseNum(CharArray input, int from, int to) {
+    static int parseNum(CharArray input, int from, int to) {
         int num = 0;
         for (int i = from; i < to; i++) {
             num = num * 10 + (input.data[i] - '0');
@@ -364,7 +372,7 @@ public final class DateParser {
         return num;
     }
 
-    CharArray buildInput(String str) {
+    static CharArray buildInput(String str) {
         char[] chars = str.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             char ch = chars[i];
@@ -373,14 +381,6 @@ public final class DateParser {
             }
         }
         return new CharArray(chars);
-    }
-
-    private DateTimeParseException error(int offset) {
-        return error(offset, String.format("Text %s cannot parse at %d", input, offset));
-    }
-
-    private DateTimeParseException error(int offset, String msg) {
-        return new DateTimeParseException(msg, input, offset);
     }
 
     static class CharArray implements CharSequence {

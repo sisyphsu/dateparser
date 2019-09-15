@@ -113,14 +113,14 @@ public final class DateParserBuilder {
         // support all languages' default TimeZone
         for (String zoneId : TimeZone.getAvailableIDs()) {
             final TimeZone zone = TimeZone.getTimeZone(zoneId);
-            final RuleHandler handler = (cs, from, to, dt) -> dt.zone = zone;
+            final RuleHandler handler = (cs, matcher, dt) -> dt.zone = zone;
 
             register(String.format(" \\Q%s\\E", zone.getID().toLowerCase()), handler);
         }
 
         // support others no-standard 'timezone'
-        register(" pdt", (cs, from, to, dt) -> dt.zone = TimeZone.getTimeZone("America/Los_Angeles"));
-        register(" cest", (cs, from, to, dt) -> dt.zone = TimeZone.getTimeZone("CET"));
+        register(" pdt", (cs, matcher, dt) -> dt.zone = TimeZone.getTimeZone("America/Los_Angeles"));
+        register(" cest", (cs, matcher, dt) -> dt.zone = TimeZone.getTimeZone("CET"));
 
         // MSK m=+0.000000001
         register(" msk m=[+-]\\d\\.\\d+");
@@ -187,7 +187,7 @@ public final class DateParserBuilder {
      */
     public DateParserBuilder addRule(String rule, RuleHandler handler) {
         if (!customizedRuleMap.containsKey(rule)) {
-            standardRules.add(rule);
+            rules.add(rule);
         }
         customizedRuleMap.put(rule, handler);
         return this;
