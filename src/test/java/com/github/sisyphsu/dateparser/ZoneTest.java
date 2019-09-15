@@ -1,4 +1,4 @@
-package com.github.sisyphsu;
+package com.github.sisyphsu.dateparser;
 
 import org.junit.jupiter.api.Test;
 

@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.TimeZone;
 
@@ -25,7 +24,9 @@ public final class DateTime {
     int minute;
     int second;
     int ns;
+    long unixsecond;
 
+    boolean am;
     boolean pm;
 
     boolean zoneOffsetSetted;
@@ -36,14 +37,16 @@ public final class DateTime {
      * Reset this instance, clear all fields to be default value.
      */
     void reset() {
-        this.week = 0;
+        this.week = 1;
         this.year = 0;
-        this.month = 0;
-        this.day = 0;
+        this.month = 1;
+        this.day = 1;
         this.hour = 0;
         this.minute = 0;
         this.second = 0;
         this.ns = 0;
+        this.unixsecond = 0;
+        this.am = false;
         this.pm = false;
         this.zoneOffsetSetted = false;
         this.zoneOffset = 0;
@@ -51,15 +54,31 @@ public final class DateTime {
     }
 
     /**
-     * Convert this instance into DateTime
+     * Convert this DateTime into LocalDateTime
+     *
+     * @return LocalDateTime
+     */
+    public LocalDateTime toLocalDateTime() {
+        LocalDateTime dateTime = this.buildDateTime();
+        // with ZoneOffset
+        if (zoneOffsetSetted) {
+            ZoneOffset offset = ZoneOffset.ofHoursMinutes(zoneOffset / 60, zoneOffset % 60);
+            return dateTime.atOffset(offset).toLocalDateTime();
+        }
+        // with TimeZone
+        if (zone != null) {
+            return dateTime.atZone(zone.toZoneId()).toLocalDateTime();
+        }
+        return dateTime;
+    }
+
+    /**
+     * Convert this instance into OffsetDateTime
      *
      * @return DateTime with TimeZoneOffset
      */
-    OffsetDateTime toOffsetDateTime() {
-        if (pm) {
-            this.hour += 12;
-        }
-        LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second, ns);
+    public OffsetDateTime toOffsetDateTime() {
+        LocalDateTime dateTime = this.buildDateTime();
         // with ZoneOffset
         if (zoneOffsetSetted) {
             ZoneOffset offset = ZoneOffset.ofHoursMinutes(zoneOffset / 60, zoneOffset % 60);
@@ -70,7 +89,23 @@ public final class DateTime {
             return dateTime.atZone(zone.toZoneId()).toOffsetDateTime();
         }
         // with default
-        return dateTime.atZone(ZoneId.systemDefault()).toOffsetDateTime();
+        return dateTime.atZone(ZoneOffset.ofHoursMinutes(0, 0)).toOffsetDateTime();
+    }
+
+    /**
+     * Build DateTime without TimeZone
+     */
+    private LocalDateTime buildDateTime() {
+        if (unixsecond > 0) {
+            return LocalDateTime.ofEpochSecond(unixsecond, ns, ZoneOffset.UTC);
+        }
+        if (am && hour == 12) {
+            this.hour = 0;
+        }
+        if (pm && hour != 12) {
+            this.hour += 12;
+        }
+        return LocalDateTime.of(year, month, day, hour, minute, second, ns);
     }
 
 }
