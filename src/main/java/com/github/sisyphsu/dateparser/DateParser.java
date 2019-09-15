@@ -99,7 +99,7 @@ public final class DateParser {
     /**
      * Execute datetime's parsing
      */
-    private void parse(final CharSequence input) {
+    private void parse(final CharArray input) {
         matcher.reset(input);
         int offset = 0;
         while (matcher.find(offset)) {
@@ -208,15 +208,15 @@ public final class DateParser {
     /**
      * Parse an subsequence which represent dd/mm or mm/dd, it should be more smart for different locales.
      */
-    private void parseDayOrMonth(CharSequence str, int from, int to) {
-        char next = str.charAt(from + 1);
+    void parseDayOrMonth(CharArray input, int from, int to) {
+        char next = input.data[from + 1];
         int a, b;
         if (next < '0' || next > '9') {
-            a = parseNum(str, from, from + 1);
-            b = parseNum(str, from + 2, to);
+            a = parseNum(input, from, from + 1);
+            b = parseNum(input, from + 2, to);
         } else {
-            a = parseNum(str, from, from + 2);
-            b = parseNum(str, from + 3, to);
+            a = parseNum(input, from, from + 2);
+            b = parseNum(input, from + 3, to);
         }
         if (a > 31 || b > 31 || a == 0 || b == 0 || (a > 12 && b > 12)) {
             throw error(from, "Invalid DayOrMonth at " + from);
@@ -233,12 +233,12 @@ public final class DateParser {
     /**
      * Parse an subsequence which represent year, like '2019', '19' etc
      */
-    int parseYear(CharSequence str, int from, int to) {
+    int parseYear(CharArray input, int from, int to) {
         switch (to - from) {
             case 4:
-                return parseNum(str, from, to);
+                return parseNum(input, from, to);
             case 2:
-                int num = parseNum(str, from, to);
+                int num = parseNum(input, from, to);
                 return (num > 50 ? 1900 : 2000) + num;
             case 0:
                 return 0;
@@ -250,16 +250,16 @@ public final class DateParser {
     /**
      * Parse an subsequence which represent the offset of timezone, like '+0800', '+08', '+08:00' etc
      */
-    int parseZoneOffset(CharSequence str, int from, int to) {
-        boolean neg = str.charAt(from) == '-';
-        int hour = parseNum(str, from + 1, from + 3);
+    int parseZoneOffset(CharArray input, int from, int to) {
+        boolean neg = input.data[from] == '-';
+        int hour = parseNum(input, from + 1, from + 3);
         int minute = 0;
         switch (to - from) {
             case 5:
-                minute = parseNum(str, from + 3, from + 5);
+                minute = parseNum(input, from + 3, from + 5);
                 break;
             case 6:
-                minute = parseNum(str, from + 4, from + 6);
+                minute = parseNum(input, from + 4, from + 6);
         }
         return (hour * 60 + minute) * (neg ? -1 : 1);
     }
@@ -268,20 +268,20 @@ public final class DateParser {
      * Parse an subsequence which suffix second, like '.2000', '.3186369', '.257000000' etc
      * It should be treated as ms/us/ns.
      */
-    int parseNano(CharSequence str, int from, int to) {
+    int parseNano(CharArray input, int from, int to) {
         int len = to - from;
         if (len < 1) {
             return 0;
         }
-        int num = parseNum(str, from, to);
+        int num = parseNum(input, from, to);
         return NSS[len - 1] * num;
     }
 
     /**
      * Parse an subsequence which represent week, like 'Monday', 'mon' etc
      */
-    int parseWeek(CharSequence cs, int from) {
-        switch (cs.charAt(from++)) {
+    int parseWeek(CharArray input, int from) {
+        switch (input.data[from]) {
             case 'm':
                 return 1; // monday
             case 'w':
@@ -289,14 +289,14 @@ public final class DateParser {
             case 'f':
                 return 5; // friday
             case 't':
-                switch (cs.charAt(from)) {
+                switch (input.data[from + 1]) {
                     case 'u':
                         return 2; // tuesday
                     case 'h':
                         return 4; // thursday
                 }
             case 's':
-                switch (cs.charAt(from)) {
+                switch (input.data[from + 1]) {
                     case 'a':
                         return 6; // saturday
                     case 'u':
@@ -309,28 +309,28 @@ public final class DateParser {
     /**
      * Parse an subsequence which represent month, like '12', 'Feb' etc
      */
-    int parseMonth(CharSequence str, int from, int to) {
+    int parseMonth(CharArray input, int from, int to) {
         if (to - from <= 2) {
-            return parseNum(str, from, to);
+            return parseNum(input, from, to);
         }
-        switch (str.charAt(from)) {
+        switch (input.data[from]) {
             case 'a':
-                if (str.charAt(from + 1) == 'p') {
+                if (input.data[from + 1] == 'p') {
                     return 4; // april
                 }
                 return 8; // august
             case 'j':
-                if (str.charAt(from + 1) == 'a') {
+                if (input.data[from + 1] == 'a') {
                     return 1; // january
                 }
-                if (str.charAt(from + 2) == 'n') {
+                if (input.data[from + 2] == 'n') {
                     return 6; // june
                 }
                 return 7; // july
             case 'f':
                 return 2; // february
             case 'm':
-                if (str.charAt(from + 2) == 'r') {
+                if (input.data[from + 2] == 'r') {
                     return 3; // march
                 }
                 return 5; // may
@@ -349,15 +349,15 @@ public final class DateParser {
     /**
      * Parse an subsequence which represent an number, like '1234'
      */
-    int parseNum(CharSequence str, int from, int to) {
+    int parseNum(CharArray input, int from, int to) {
         int num = 0;
         for (int i = from; i < to; i++) {
-            num = num * 10 + (str.charAt(i) - '0');
+            num = num * 10 + (input.data[i] - '0');
         }
         return num;
     }
 
-    CharSequence buildInput(String str) {
+    CharArray buildInput(String str) {
         char[] chars = str.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             char ch = chars[i];
@@ -365,22 +365,7 @@ public final class DateParser {
                 chars[i] = (char) (ch + 32);
             }
         }
-        return new CharSequence() {
-            @Override
-            public int length() {
-                return chars.length;
-            }
-
-            @Override
-            public char charAt(int index) {
-                return chars[index];
-            }
-
-            @Override
-            public CharSequence subSequence(int start, int end) {
-                return null;
-            }
-        };
+        return new CharArray(chars);
     }
 
     private DateTimeParseException error(int offset) {
@@ -389,6 +374,30 @@ public final class DateParser {
 
     private DateTimeParseException error(int offset, String msg) {
         return new DateTimeParseException(msg, input, offset);
+    }
+
+    static class CharArray implements CharSequence {
+
+        char[] data;
+
+        public CharArray(char[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public int length() {
+            return data.length;
+        }
+
+        @Override
+        public char charAt(int index) {
+            return data[index];
+        }
+
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            throw new UnsupportedOperationException();
+        }
     }
 
 }
