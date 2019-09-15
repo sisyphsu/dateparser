@@ -33,8 +33,6 @@ public class DateParserUtilsTest {
         assert date.getHours() == 16;
         assert date.getMinutes() == 4;
         assert date.getSeconds() == 5;
-
-        DateParserUtils.parseOffsetDateTime("2019-01-01 10:20:30.1234[]");
     }
 
     @Test
