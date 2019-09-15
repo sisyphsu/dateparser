@@ -4,6 +4,7 @@ import com.github.sisyphsu.retree.ReMatcher;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
@@ -24,7 +25,7 @@ public final class DateParser {
     private final Set<String> standardRules = new HashSet<>();
     private final Map<String, RuleHandler> customizedRuleMap = new HashMap<>();
 
-    private String str;
+    private String input;
 
     private boolean preferMonthFirst = false;
 
@@ -51,7 +52,7 @@ public final class DateParser {
      */
     public Date parseDate(String str) {
         this.dt.reset();
-        this.str = str;
+        this.input = str;
         this.parse(buildInput(str));
         return dt.toDate();
     }
@@ -64,7 +65,7 @@ public final class DateParser {
      */
     public Calendar parseCalendar(String str) {
         this.dt.reset();
-        this.str = str;
+        this.input = str;
         this.parse(buildInput(str));
         return dt.toCalendar();
     }
@@ -77,7 +78,7 @@ public final class DateParser {
      */
     public LocalDateTime parseDateTime(String str) {
         this.dt.reset();
-        this.str = str;
+        this.input = str;
         this.parse(buildInput(str));
         return dt.toLocalDateTime();
     }
@@ -90,7 +91,7 @@ public final class DateParser {
      */
     public OffsetDateTime parseOffsetDateTime(String str) {
         this.dt.reset();
-        this.str = str;
+        this.input = str;
         this.parse(buildInput(str));
         return dt.toOffsetDateTime();
     }
@@ -102,16 +103,13 @@ public final class DateParser {
         matcher.reset(input);
         int offset = 0;
         while (matcher.find(offset)) {
-            if (matcher.start() != offset) {
-                throw new IllegalArgumentException();
-            }
             if (standardRules.contains(matcher.re())) {
                 for (int index = 1; index <= matcher.groupCount(); index++) {
                     final String groupName = matcher.groupName(index);
                     final int startOff = matcher.start(index);
                     final int endOff = matcher.end(index);
                     if (groupName == null) {
-                        throw new IllegalArgumentException("Can't parse datetime by re: " + matcher.re());
+                        throw error(offset, "Hit invalid standard rule: " + matcher.re());
                     }
                     switch (groupName) {
                         case "week":
@@ -122,18 +120,33 @@ public final class DateParser {
                             break;
                         case "month":
                             dt.month = parseMonth(input, startOff, endOff);
+                            if (dt.month <= 0 || dt.month > 12) {
+                                throw error(startOff, "Invalid month at " + startOff);
+                            }
                             break;
                         case "day":
                             dt.day = parseNum(input, startOff, endOff);
+                            if (dt.day <= 0 || dt.day > 31) {
+                                throw error(startOff, "Invalid day at " + startOff);
+                            }
                             break;
                         case "hour":
                             dt.hour = parseNum(input, startOff, endOff);
+                            if (dt.hour < 0 || dt.hour >= 24) {
+                                throw error(startOff, "Invalid hour at " + startOff);
+                            }
                             break;
                         case "minute":
                             dt.minute = parseNum(input, startOff, endOff);
+                            if (dt.minute < 0 || dt.minute >= 60) {
+                                throw error(startOff, "Invalid minute at " + startOff);
+                            }
                             break;
                         case "second":
                             dt.second = parseNum(input, startOff, endOff);
+                            if (dt.second < 0 || dt.second >= 60) {
+                                throw error(startOff, "Invalid second at " + startOff);
+                            }
                             break;
                         case "ns":
                             dt.ns = parseNano(input, startOff, endOff);
@@ -152,6 +165,9 @@ public final class DateParser {
                         case "zoneOffset":
                             dt.zoneOffsetSetted = true;
                             dt.zoneOffset = parseZoneOffset(input, startOff, endOff);
+                            if (dt.zoneOffset < -720 || dt.zoneOffset > 720) {
+                                throw error(startOff, "Invalid ZoneOffset at " + startOff);
+                            }
                             break;
                         case "zoneName":
                             // don't support by now
@@ -175,7 +191,7 @@ public final class DateParser {
                             dt.ns = parseNum(input, startOff + 10, endOff);
                             break;
                         default:
-                            throw new RuntimeException("invalid captured sequence: " + groupName);
+                            throw error(offset, "Hit invalid standard rule: " + matcher.re());
                     }
                 }
             } else {
@@ -185,7 +201,7 @@ public final class DateParser {
             offset = matcher.end();
         }
         if (offset != input.length()) {
-            throw new IllegalArgumentException("error before: " + offset);
+            throw error(offset);
         }
     }
 
@@ -202,6 +218,9 @@ public final class DateParser {
             a = parseNum(str, from, from + 2);
             b = parseNum(str, from + 3, to);
         }
+        if (a > 31 || b > 31 || a == 0 || b == 0 || (a > 12 && b > 12)) {
+            throw error(from, "Invalid DayOrMonth at " + from);
+        }
         if (b > 12 || preferMonthFirst) {
             dt.month = a;
             dt.day = b;
@@ -214,7 +233,7 @@ public final class DateParser {
     /**
      * Parse an subsequence which represent year, like '2019', '19' etc
      */
-    static int parseYear(CharSequence str, int from, int to) {
+    int parseYear(CharSequence str, int from, int to) {
         switch (to - from) {
             case 4:
                 return parseNum(str, from, to);
@@ -224,14 +243,14 @@ public final class DateParser {
             case 0:
                 return 0;
             default:
-                throw new IllegalArgumentException();
+                throw error(from, "Invalid year at " + from);
         }
     }
 
     /**
      * Parse an subsequence which represent the offset of timezone, like '+0800', '+08', '+08:00' etc
      */
-    static int parseZoneOffset(CharSequence str, int from, int to) {
+    int parseZoneOffset(CharSequence str, int from, int to) {
         boolean neg = str.charAt(from) == '-';
         int hour = parseNum(str, from + 1, from + 3);
         int minute = 0;
@@ -249,7 +268,7 @@ public final class DateParser {
      * Parse an subsequence which suffix second, like '.2000', '.3186369', '.257000000' etc
      * It should be treated as ms/us/ns.
      */
-    static int parseNano(CharSequence str, int from, int to) {
+    int parseNano(CharSequence str, int from, int to) {
         int len = to - from;
         if (len < 1) {
             return 0;
@@ -261,7 +280,7 @@ public final class DateParser {
     /**
      * Parse an subsequence which represent week, like 'Monday', 'mon' etc
      */
-    static int parseWeek(CharSequence cs, int from) {
+    int parseWeek(CharSequence cs, int from) {
         switch (cs.charAt(from++)) {
             case 'm':
                 return 1; // monday
@@ -284,13 +303,13 @@ public final class DateParser {
                         return 7; // sunday
                 }
         }
-        throw new IllegalArgumentException();
+        throw error(from, "Invalid week at " + from);
     }
 
     /**
      * Parse an subsequence which represent month, like '12', 'Feb' etc
      */
-    static int parseMonth(CharSequence str, int from, int to) {
+    int parseMonth(CharSequence str, int from, int to) {
         if (to - from <= 2) {
             return parseNum(str, from, to);
         }
@@ -324,20 +343,21 @@ public final class DateParser {
             case 'd':
                 return 12; // december
         }
-        throw new IllegalArgumentException();
+        throw error(from, "Invalid month at " + from);
     }
 
     /**
      * Parse an subsequence which represent an number, like '1234'
      */
-    static int parseNum(CharSequence str, int from, int to) {
+    int parseNum(CharSequence str, int from, int to) {
         int num = 0;
-        for (int i = from; i < to; i++)
+        for (int i = from; i < to; i++) {
             num = num * 10 + (str.charAt(i) - '0');
+        }
         return num;
     }
 
-    static CharSequence buildInput(String str) {
+    CharSequence buildInput(String str) {
         char[] chars = str.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             char ch = chars[i];
@@ -361,6 +381,14 @@ public final class DateParser {
                 return null;
             }
         };
+    }
+
+    private DateTimeParseException error(int offset) {
+        return error(offset, String.format("Text %s cannot parse at %d", input, offset));
+    }
+
+    private DateTimeParseException error(int offset, String msg) {
+        return new DateTimeParseException(msg, input, offset);
     }
 
 }

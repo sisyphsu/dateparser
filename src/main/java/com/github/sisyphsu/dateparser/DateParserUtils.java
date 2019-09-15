@@ -58,7 +58,7 @@ public final class DateParserUtils {
     /**
      * Register new standard parse rules, all captured group should have the specified names.
      *
-     * @param re The regex of rule, like '(?<year>\d{4})'
+     * @param re The regex of rule
      */
     public static synchronized void registerStandardRule(String re) {
         Rules.register(re);
