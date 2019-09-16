@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Test DateParser's normal function, lots of examples are copied from https://github.com/araddon/dateparse.
@@ -32,6 +33,8 @@ public class DateParserUtilsTest {
 
     @Test
     public void testDate() {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT+08:00"));
+
         Date date = DateParserUtils.parseDate("Mon Jan 02 15:04:05 -0700 2006");
         assert date.getYear() == 2006 - 1900;
         assert date.getMonth() == Calendar.JANUARY;
@@ -78,6 +81,8 @@ public class DateParserUtilsTest {
 
     @Test
     public void testDateTime() {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT+08:00"));
+
         LocalDateTime dateTime = DateParserUtils.parseDateTime("Mon Jan 02 15:04:05 -0700 2006");
         assert dateTime.getYear() == 2006;
         assert dateTime.getMonth() == Month.JANUARY;
