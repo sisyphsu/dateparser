@@ -2,9 +2,7 @@ package com.github.sisyphsu.dateparser;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
+import java.time.*;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -81,15 +79,15 @@ public class DateParserUtilsTest {
 
     @Test
     public void testDateTime() {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT+08:00"));
-
         LocalDateTime dateTime = DateParserUtils.parseDateTime("Mon Jan 02 15:04:05 -0700 2006");
-        assert dateTime.getYear() == 2006;
-        assert dateTime.getMonth() == Month.JANUARY;
-        assert dateTime.getDayOfMonth() == 3;
-        assert dateTime.getHour() == 6;
-        assert dateTime.getMinute() == 4;
-        assert dateTime.getSecond() == 5;
+        ZonedDateTime zonedDateTime = dateTime.atZone(ZoneId.of("GMT+0800"));
+
+        assert zonedDateTime.getYear() == 2006;
+        assert zonedDateTime.getMonth() == Month.JANUARY;
+        assert zonedDateTime.getDayOfMonth() == 3;
+        assert zonedDateTime.getHour() == 6;
+        assert zonedDateTime.getMinute() == 4;
+        assert zonedDateTime.getSecond() == 5;
     }
 
     @Test

@@ -61,7 +61,7 @@ public class DateBuilderTest {
         builder.setNs(900000000);
         builder.setZone(TimeZone.getDefault());
 
-        LocalDateTime dateTime = builder.toLocalDateTime();
+        ZonedDateTime dateTime = builder.toLocalDateTime().atZone(ZoneId.of("GMT+0800"));
         assert dateTime.getYear() == builder.getYear();
         assert dateTime.getMonth() == Month.of(builder.getMonth());
         assert dateTime.getDayOfMonth() == builder.getDay();
