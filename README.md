@@ -1,4 +1,8 @@
 # dateparser
+ 
+[![Travis CI](https://travis-ci.org/Microsoft/vscode-java-debug.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-java-debug)
+
+# Introduce
 
 `dateparser` is an smart and high-performance datetime parser library, it supports hundreds of different patterns. 
 
