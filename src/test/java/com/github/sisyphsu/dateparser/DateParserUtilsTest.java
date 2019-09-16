@@ -19,6 +19,18 @@ import java.util.Date;
 public class DateParserUtilsTest {
 
     @Test
+    public void demo() {
+        Date date = DateParserUtils.parseDate("Mon Jan 02 15:04:05 -0700 2006");
+        System.out.println(date);
+        Calendar calendar = DateParserUtils.parseCalendar("Fri Jul 03 2015 18:04:07 GMT+0100 (GMT Daylight Time)");
+        System.out.println(calendar.toInstant());
+        LocalDateTime dateTime = DateParserUtils.parseDateTime("2019-09-20 10:20:30.12345678 +0200");
+        System.out.println(dateTime);
+        OffsetDateTime offsetDateTime = DateParserUtils.parseOffsetDateTime("2015-09-30 18:48:56.35272715 +0000 UTC");
+        System.out.println(offsetDateTime);
+    }
+
+    @Test
     public void testDate() {
         Date date = DateParserUtils.parseDate("Mon Jan 02 15:04:05 -0700 2006");
         assert date.getYear() == 2006 - 1900;
