@@ -1,6 +1,7 @@
 # dateparser
  
 [![Travis CI](https://travis-ci.org/sisyphsu/dateparser.svg?branch=master)](https://travis-ci.org/sisyphsu/dateparser)
+[![codecov](https://codecov.io/gh/sisyphsu/dateparser/branch/master/graph/badge.svg)](https://codecov.io/gh/sisyphsu/dateparser)
 
 # Introduce
 
@@ -33,7 +34,7 @@ Add maven dependency:
 <dependency>
   <groupId>com.github.sisyphsu</groupId>
   <artifactId>dateparser</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 
@@ -252,6 +253,14 @@ October 7th, 1970
 ```
 
 Lots of these examples were copied from https://github.com/araddon/dateparse.
+
+# Support
+
+Let me know if you meet any issues when using this library.
+
+Let me know if you need any features that this library hasn't yet.
+
+Pull Request are welcomed.
 
 # License
 
