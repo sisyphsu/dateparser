@@ -37,7 +37,7 @@ Add maven dependency:
 
 Parse `String` into `Date`, `Calendar`, `LocalDateTime`, `OffsetDateTime`:
 
-```
+```java
 Date date = DateParserUtils.parseDate("Mon Jan 02 15:04:05 -0700 2006");
 // Tue Jan 03 06:04:05 CST 2006
 Calendar calendar = DateParserUtils.parseCalendar("Fri Jul 03 2015 18:04:07 GMT+0100 (GMT Daylight Time)");
@@ -57,7 +57,7 @@ so `DateParserUtils` maintains one parser as default, and wrap it with `synchron
 
 If you want to use it concurrently, you should create new parser like this:
 
-```
+```java
 DateParser parser = DateParser.newBuilder().build();
 Date date = parser.parseDate("Mon Jan 02 15:04:05 -0700 2006");
 // Tue Jan 03 06:04:05 CST 2006
@@ -74,7 +74,7 @@ because most of countries use `dd/MM/yy`, but little of countries use `MM/dd/yy`
 
 So `dateparser` will use `dd/MM` as priority, but you could change it by:
 
-```
+```java
 DateParserUtils.preferMonthFirst(true);
 DateParserUtils.parseCalendar("08.03.71");
 // 1971-08-03
@@ -92,7 +92,7 @@ and customize new rules to parse different input.
 
 Like add support for `【2019】`, which isn't supported by default:
 
-```
+```java
 DateParser parser = DateParser.newBuilder().addRule("【(?<year>\\d{4})】").build();
 Calendar calendar = parser.parseCalendar("【1991】");
 assert calendar.get(Calendar.YEAR) == 1991;
@@ -102,7 +102,7 @@ The group name `year` is very important, you cannot use other unknown name.
 
 But, you can register new handler to parse the new rule:
 
-```
+```java
 DateParser parser = DateParser.newBuilder()
     .addRule("民国(\\d{3})年", (input, matcher, dt) -> {
         int offset = matcher.start(1);
