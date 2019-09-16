@@ -30,6 +30,11 @@ public class DateParserTest {
         assert dateTime.getDayOfMonth() == 16;
         assert dateTime.getHour() == 8;
         assert dateTime.getOffset().getTotalSeconds() == 0;
+
+        dateTime = parser.parseOffsetDateTime("Mon Sep 16 2019 10:44:33 GMT+0800 (中国标准时间)");
+        assert dateTime.getYear() == 2019;
+        assert dateTime.getMonth() == Month.SEPTEMBER;
+        assert dateTime.getDayOfMonth() == 16;
     }
 
     @Test

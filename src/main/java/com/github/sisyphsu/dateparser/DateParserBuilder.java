@@ -111,7 +111,7 @@ public final class DateParserBuilder {
         register(" ?(?<m>am|pm)\\W*");
 
         // (CEST) (GMT Daylight Time)
-        register(" [(](?<zoneName>\\w+(?: \\w+)*)[)]");
+        register(" [(](?<zoneName>.+)[)]");
 
         // support all languages' default TimeZone
         for (String zoneId : TimeZone.getAvailableIDs()) {
