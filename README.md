@@ -1,6 +1,6 @@
 # dateparser
  
-[![Travis CI](https://travis-ci.org/Microsoft/vscode-java-debug.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-java-debug)
+[![Travis CI](https://travis-ci.org/sisyphsu/dateparser.svg?branch=master)](https://travis-ci.org/sisyphsu/dateparser)
 
 # Introduce
 
