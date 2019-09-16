@@ -2,11 +2,12 @@ package com.github.sisyphsu.dateparser;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Test DateParser's normal function, lots of examples are copied from https://github.com/araddon/dateparse.
@@ -31,15 +32,8 @@ public class DateParserUtilsTest {
 
     @Test
     public void testDate() {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT+08:00"));
-
-        Date date = DateParserUtils.parseDate("Mon Jan 02 15:04:05 -0700 2006");
-        assert date.getYear() == 2006 - 1900;
-        assert date.getMonth() == Calendar.JANUARY;
-        assert date.getDate() == 3;
-        assert date.getHours() == 6;
-        assert date.getMinutes() == 4;
-        assert date.getSeconds() == 5;
+        Date date1 = DateParserUtils.parseDate("Mon Jan 02 15:04:05 -0700 2006");
+        Date date2 = DateParserUtils.parseDate("2006-1-2 6:04:05 +0700");
 
         OffsetDateTime dateTime = DateParserUtils.parseOffsetDateTime("Mon Jan 02 15:04:05 +0700 2006");
         assert dateTime.getYear() == 2006;
@@ -79,16 +73,10 @@ public class DateParserUtilsTest {
 
     @Test
     public void testDateTime() {
-        LocalDateTime dateTime = DateParserUtils.parseDateTime("Mon Jan 02 15:04:05 -0700 2006");
-        ZonedDateTime zonedDateTime = dateTime.atZone(ZoneId.of("GMT+0800"));
+        LocalDateTime dateTime1 = DateParserUtils.parseDateTime("Mon Jan 02 15:04:05 -0700 2006");
+        LocalDateTime dateTime2 = DateParserUtils.parseDateTime("2006-1-3 6:04:05 +0800");
 
-        System.out.println("ZonedDateTime: " + zonedDateTime);
-        assert zonedDateTime.getYear() == 2006;
-        assert zonedDateTime.getMonth() == Month.JANUARY;
-        assert zonedDateTime.getDayOfMonth() == 3;
-        assert zonedDateTime.getHour() == 6;
-        assert zonedDateTime.getMinute() == 4;
-        assert zonedDateTime.getSecond() == 5;
+        assert dateTime1.equals(dateTime2);
     }
 
     @Test

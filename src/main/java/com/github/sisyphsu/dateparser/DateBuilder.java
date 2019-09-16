@@ -18,8 +18,8 @@ import java.util.TimeZone;
 @Setter
 public final class DateBuilder {
 
-    private static final ZoneOffset SYSTEM_ZONE_OFFSET = OffsetDateTime.now().getOffset();
     private static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
+    private static final ZoneOffset DEFAULT_OFFSET = OffsetDateTime.now().getOffset();
 
     int week;
     int year;
@@ -66,7 +66,7 @@ public final class DateBuilder {
             return toCalendar().getTime();
         }
         LocalDateTime dateTime = toLocalDateTime();
-        long second = dateTime.toEpochSecond(SYSTEM_ZONE_OFFSET);
+        long second = dateTime.toEpochSecond(DEFAULT_OFFSET);
         long ns = dateTime.getNano();
         return new Date(second * 1000 + ns / 1000000);
     }
@@ -114,11 +114,11 @@ public final class DateBuilder {
         int zoneSecond = 0;
         // with TimeZone
         if (zone != null) {
-            zoneSecond = SYSTEM_ZONE_OFFSET.getTotalSeconds() - zone.getRawOffset() / 1000;
+            zoneSecond = (TimeZone.getDefault().getRawOffset() - zone.getRawOffset()) / 1000;
         }
         // with ZoneOffset
         if (zoneOffsetSetted) {
-            zoneSecond = SYSTEM_ZONE_OFFSET.getTotalSeconds() - zoneOffset * 60;
+            zoneSecond = TimeZone.getDefault().getRawOffset() / 1000 - zoneOffset * 60;
         }
         return zoneSecond == 0 ? dateTime : dateTime.plusSeconds(zoneSecond);
     }
