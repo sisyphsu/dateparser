@@ -82,6 +82,7 @@ public class DateParserUtilsTest {
         LocalDateTime dateTime = DateParserUtils.parseDateTime("Mon Jan 02 15:04:05 -0700 2006");
         ZonedDateTime zonedDateTime = dateTime.atZone(ZoneId.of("GMT+0800"));
 
+        System.out.println("ZonedDateTime: " + zonedDateTime);
         assert zonedDateTime.getYear() == 2006;
         assert zonedDateTime.getMonth() == Month.JANUARY;
         assert zonedDateTime.getDayOfMonth() == 3;
