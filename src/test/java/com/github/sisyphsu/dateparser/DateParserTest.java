@@ -52,10 +52,10 @@ public class DateParserTest {
         assert match("yyyy-MM-dd HH:mm:ss Z", "1970-10-07 00:00:00 +0000", "oct. 7, 1970");
         assert match("yyyy-MM-dd HH:mm:ss Z", "1970-10-07 00:00:00 +0000", "oct. 7, 70");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 +0000", "Mon Jan  2 15:04:05 2006");
-        assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 +0000", "Mon Jan  2 15:04:05 MST 2006");
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 -0700", "Mon Jan  2 15:04:05 MST 2006");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 -0700", "Mon Jan 02 15:04:05 -0700 2006");
-        assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 +0000", "Monday, 02-Jan-06 15:04:05 MST");
-        assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 +0000", "Mon, 02 Jan 2006 15:04:05 MST");
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 -0700", "Monday, 02-Jan-06 15:04:05 MST");
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 -0700", "Mon, 02 Jan 2006 15:04:05 MST");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2017-07-11 16:28:13 +0200", "Tue, 11 Jul 2017 16:28:13 +0200 (CEST)");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 -0700", "Mon, 02 Jan 2006 15:04:05 -0700");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2018-01-04 17:53:36 +0000", "Thu, 4 Jan 2018 17:53:36 +0000");

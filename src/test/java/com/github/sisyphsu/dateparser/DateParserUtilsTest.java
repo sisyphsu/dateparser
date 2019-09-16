@@ -42,7 +42,7 @@ public class DateParserUtilsTest {
     public void testCalendar() {
         Calendar calendar = DateParserUtils.parseCalendar("Fri Jul 03 2015 18:04:07 GMT+0100 (GMT Daylight Time)");
         assert calendar.get(Calendar.YEAR) == 2015;
-        assert calendar.get(Calendar.MONTH) == 7;
+        assert calendar.get(Calendar.MONTH) == Calendar.JULY;
         assert calendar.get(Calendar.DAY_OF_MONTH) == 3;
         assert calendar.get(Calendar.HOUR_OF_DAY) == 18;
         assert calendar.get(Calendar.MINUTE) == 4;
@@ -55,12 +55,12 @@ public class DateParserUtilsTest {
         Calendar calendar;
         DateParserUtils.preferMonthFirst(true);
         calendar = DateParserUtils.parseCalendar("08.03.71");
-        assert calendar.get(Calendar.MONTH) == 8;
+        assert calendar.get(Calendar.MONTH) == Calendar.AUGUST;
         assert calendar.get(Calendar.DAY_OF_MONTH) == 3;
 
         DateParserUtils.preferMonthFirst(false);
         calendar = DateParserUtils.parseCalendar("08.03.71");
-        assert calendar.get(Calendar.MONTH) == 3;
+        assert calendar.get(Calendar.MONTH) == Calendar.MARCH;
         assert calendar.get(Calendar.DAY_OF_MONTH) == 8;
     }
 

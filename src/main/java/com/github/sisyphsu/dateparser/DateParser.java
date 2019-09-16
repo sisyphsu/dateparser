@@ -143,6 +143,9 @@ public final class DateParser {
             if (groupName == null) {
                 throw error(offset, "Hit invalid standard rule: " + matcher.re());
             }
+            if (startOff == -1 && endOff == -1) {
+                continue;
+            }
             switch (groupName) {
                 case "week":
                     dt.week = parseWeek(input, startOff);

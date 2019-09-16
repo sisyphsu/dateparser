@@ -44,7 +44,7 @@ public class DateBuilderTest {
         builder.setDay(1);
         Date date = builder.toDate();
         assert date.getYear() == builder.getYear() - 1900;
-        assert date.getMonth() == builder.getMonth();
+        assert date.getMonth() == builder.getMonth() - 1;
         assert date.getDate() == builder.getDay();
     }
 
