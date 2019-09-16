@@ -8,10 +8,11 @@
     <artifactId>dateparser</artifactId>
     <version>1.0.0</version>
 
-    <name>retree</name>
+    <name>dateparser</name>
     <url>https://github.com/sisyphsu/dateparser</url>
     <description>
-        Merge multiple regexs as one regex-tree, which support quickly and concurrently regex matching.
+        Based on retree's multiple regexs matching features, provides an smart and high-performance datetime parser,
+        which supports hundreds of patterns.
     </description>
 
     <properties>
