@@ -19,7 +19,7 @@ the performance would be a disaster.
 So I choice to use `retree`, `retree` could merge lots of regular expressions as one, 
 in my opinion, it is more like a tree, which could execute matching quickly and concurrently. 
 
-You can also customize you own parser, by add new rules.
+You can also customize your own parser, by add new rules.
 
 # Install
 
