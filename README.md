@@ -7,7 +7,7 @@
 
 # Introduce
 
-`dateparser` is an smart and high-performance datetime parser library, it supports hundreds of different patterns. 
+`dateparser` is a smart and high-performance datetime parser library, it supports hundreds of different patterns. 
 
 For better performance and flexibility, 
 `dateparser` doesn't use `SimpleDateFormat` or `DateTimeFormatter`, 
