@@ -200,7 +200,7 @@ public final class DateParser {
                 case "zoneOffset":
                     dt.zoneOffsetSetted = true;
                     dt.zoneOffset = parseZoneOffset(input, startOff, endOff);
-                    if (dt.zoneOffset < -720 || dt.zoneOffset > 720) {
+                    if (dt.zoneOffset < -1080 || dt.zoneOffset > 1080) {
                         throw error(startOff, "Invalid ZoneOffset at " + startOff);
                     }
                     break;

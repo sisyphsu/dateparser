@@ -20,7 +20,7 @@ public class DateParserUtilsTest {
 
     @Test
     public void demo() {
-        Date date = DateParserUtils.parseDate("Mon Jan 02 15:04:05 -0700 2006");
+        Date date = DateParserUtils.parseDate("12-Dec-05");
         System.out.println(date);
         Calendar calendar = DateParserUtils.parseCalendar("Fri Jul 03 2015 18:04:07 GMT+0100 (GMT Daylight Time)");
         System.out.println(calendar.toInstant());

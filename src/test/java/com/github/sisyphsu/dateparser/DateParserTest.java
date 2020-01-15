@@ -143,6 +143,12 @@ public class DateParserTest {
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-01 00:00:00 +0000", "2014.03");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-30 00:00:00 +0000", "2014.03.30");
 
+        // test ZoneOffset
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-30 00:00:00 -1400", "2014.03.30 00:00:00 -1400");
+        assert matchStamp("yyyy-MM-dd HH:mm:ss Z", "2014-03-30 14:00:00 +0000", "2014.03.30 00:00:00 -1400");
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-30 00:00:00 +1300", "2014.03.30 00:00:00 +1300");
+        assert matchStamp("yyyy-MM-dd HH:mm:ss Z", "2014-03-30 00:00:00 +0000", "2014.03.30 13:00:00 +1300");
+
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-06-01 00:00:00 +0000", "20140601");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-07-22 10:52:03 +0000", "20140722105203");
 
@@ -159,5 +165,14 @@ public class DateParserTest {
 
         return dt1.equals(dt2);
     }
+
+    private boolean matchStamp(String format, String datetime, String freeDatetime) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern(format).toFormatter();
+        OffsetDateTime dt1 = OffsetDateTime.parse(datetime, formatter);
+        OffsetDateTime dt2 = parser.parseOffsetDateTime(freeDatetime);
+
+        return dt1.toEpochSecond() == dt2.toEpochSecond();
+    }
+
 
 }
