@@ -99,7 +99,7 @@ public final class DateParserBuilder {
         register("^(?<nanosecond>\\d{19})$");
 
         // at hh:mm:ss.SSSSZ
-        register("\\W*(?:at )?(?<hour>\\d{1,2}):(?<minute>\\d{1,2})(?::(?<second>\\d{1,2}))?(?:[.,](?<ns>\\d{1,9}))?(?<zero>z)?");
+        register("\\W*(?:at )?(?<hour>\\d{1,2})[:.](?<minute>\\d{1,2})(?::(?<second>\\d{1,2}))?(?:[.,](?<ns>\\d{1,9}))?(?<zero>z)?");
 
         // +08:00
         register(" ?(?<zoneOffset>[-+]\\d{2}:?(?:\\d{2})?)");

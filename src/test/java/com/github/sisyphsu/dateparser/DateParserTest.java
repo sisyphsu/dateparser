@@ -56,6 +56,7 @@ public class DateParserTest {
         assert match("yyyy-MM-dd HH:mm:ss Z", "1970-10-07 00:00:00 +0000", "oct 7, '70");
         assert match("yyyy-MM-dd HH:mm:ss Z", "1970-10-07 00:00:00 +0000", "oct. 7, 1970");
         assert match("yyyy-MM-dd HH:mm:ss Z", "1970-10-07 00:00:00 +0000", "oct. 7, 70");
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2020-01-15 10:21:00 +0000", "15. jan. 2020 10.21");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 +0000", "Mon Jan  2 15:04:05 2006");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 -0700", "Mon Jan  2 15:04:05 MST 2006");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2006-01-02 15:04:05 -0700", "Mon Jan 02 15:04:05 -0700 2006");
@@ -142,6 +143,7 @@ public class DateParserTest {
         assert match("yyyy-MM-dd HH:mm:ss Z", "1971-08-21 00:00:00 +0000", "08.21.71");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-01 00:00:00 +0000", "2014.03");
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-30 00:00:00 +0000", "2014.03.30");
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2019-07-11 20:52:00 +0000", "07.11.2019 20.52");
 
         // test ZoneOffset
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-03-30 00:00:00 -1400", "2014.03.30 00:00:00 -1400");
