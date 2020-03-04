@@ -2,12 +2,14 @@ package com.github.sisyphsu.dateparser;
 
 import org.junit.jupiter.api.Test;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Test DateParser's normal function, lots of examples are copied from https://github.com/araddon/dateparse.
@@ -231,6 +233,15 @@ public class DateParserUtilsTest {
         } catch (Exception e) {
             assert e instanceof DateTimeParseException;
         }
+    }
+
+    @Test
+    public void test() {
+        Date date = DateParserUtils.parseDate("Sat, 29 Feb 2020 01:21:19+5:30");
+        System.out.println(date);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        System.out.println("Output: " + dateFormat.format(date));
     }
 
 }

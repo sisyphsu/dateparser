@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author sulin
@@ -53,7 +54,8 @@ public class DateParserBuilderTest {
             assert e instanceof DateTimeParseException;
         }
         try {
-            DateParserUtils.parseDate("2019-01-10 0000000000");
+            Date date = DateParserUtils.parseDate("2019-01-10 0000000000");
+            System.out.println(date);
             assert false;
         } catch (Exception e) {
             assert e instanceof DateTimeParseException;

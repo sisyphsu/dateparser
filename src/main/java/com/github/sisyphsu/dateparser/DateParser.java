@@ -274,18 +274,28 @@ public final class DateParser {
     }
 
     /**
-     * Parse an subsequence which represent the offset of timezone, like '+0800', '+08', '+08:00' etc
+     * Parse an subsequence which represent the offset of timezone, like '+0800', '+08', '+8:00', '+08:00' etc
      */
     int parseZoneOffset(CharArray input, int from, int to) {
         boolean neg = input.data[from] == '-';
-        int hour = parseNum(input, from + 1, from + 3);
+        from++;
+        // parse hour
+        int hour;
+        if (from + 2 <= to && Character.isDigit(input.charAt(from + 1))) {
+            hour = parseNum(input, from, from + 2);
+            from += 2;
+        } else {
+            hour = parseNum(input, from, from + 1);
+            from += 1;
+        }
+        // skip ':' optionally
+        if (from + 3 <= to && input.charAt(from) == ':') {
+            from++;
+        }
+        // parse minute optionally
         int minute = 0;
-        switch (to - from) {
-            case 5:
-                minute = parseNum(input, from + 3, from + 5);
-                break;
-            case 6:
-                minute = parseNum(input, from + 4, from + 6);
+        if (from + 2 <= to) {
+            minute = parseNum(input, from, from + 2);
         }
         return (hour * 60 + minute) * (neg ? -1 : 1);
     }

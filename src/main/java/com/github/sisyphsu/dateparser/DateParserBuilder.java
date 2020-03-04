@@ -102,7 +102,7 @@ public final class DateParserBuilder {
         register("\\W*(?:at )?(?<hour>\\d{1,2}):(?<minute>\\d{1,2})(?::(?<second>\\d{1,2}))?(?:[.,](?<ns>\\d{1,9}))?(?<zero>z)?");
 
         // +08:00
-        register(" ?(?<zoneOffset>[-+]\\d{2}:?(?:\\d{2})?)");
+        register(" ?(?<zoneOffset>[-+]\\d{1,2}:?(?:\\d{2})?)");
 
         // 12 o’clock
         register(" ?(?<hour>\\d{1,2}) o’clock\\W*");
