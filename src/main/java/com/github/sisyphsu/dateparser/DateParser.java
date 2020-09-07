@@ -214,16 +214,16 @@ public final class DateParser {
                     dt.unixsecond = parseNum(input, startOff, startOff + 10);
                     break;
                 case "millisecond":
-                    dt.unixsecond = parseNum(input, startOff, startOff + 10);
-                    dt.ns = parseNum(input, startOff + 10, endOff) * 1000000;
+                    dt.unixsecond = parseNum(input, startOff, endOff - 3);
+                    dt.ns = parseNum(input, endOff - 3, endOff) * 1000000;
                     break;
                 case "microsecond":
-                    dt.unixsecond = parseNum(input, startOff, startOff + 10);
-                    dt.ns = parseNum(input, startOff + 10, endOff) * 1000;
+                    dt.unixsecond = parseNum(input, startOff, endOff - 6);
+                    dt.ns = parseNum(input, endOff - 6, endOff) * 1000;
                     break;
                 case "nanosecond":
-                    dt.unixsecond = parseNum(input, startOff, startOff + 10);
-                    dt.ns = parseNum(input, startOff + 10, endOff);
+                    dt.unixsecond = parseNum(input, startOff, endOff - 9);
+                    dt.ns = parseNum(input, endOff - 9, endOff);
                     break;
                 default:
                     throw error(offset, "Hit invalid standard rule: " + matcher.re());

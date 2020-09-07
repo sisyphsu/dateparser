@@ -90,7 +90,7 @@ public final class DateParserBuilder {
         register("^(?<unixsecond>\\d{10})$");
 
         // millisecond(13)
-        register("^(?<millisecond>\\d{13})$");
+        register("^(?<millisecond>\\d{11,13})$");
 
         // microsecond(16)
         register("^(?<microsecond>\\d{16})$");

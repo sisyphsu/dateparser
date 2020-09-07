@@ -103,4 +103,23 @@ public class DateBuilderTest {
         assert builder.isZoneOffsetSetted();
     }
 
+    @Test
+    public void testDemo() {
+        final DateParser dp = DateParser.newBuilder().build();
+        final String date = "2020-06-08T13:45:05-00:00";
+        System.out.println(dp.parseDate(date).toString());
+        System.out.println(dp.parseDateTime(date).toString());
+        System.out.println(dp.parseOffsetDateTime(date).toString());
+
+        System.out.println(OffsetDateTime.now());
+    }
+
+    @Test
+    public void testTimestamp() {
+        String timestamp = "946656000000";
+        Date date = DateParserUtils.parseDate(timestamp);
+        System.out.println(date.getTime());
+        assert date.getTime() == Long.valueOf(timestamp);
+    }
+
 }
