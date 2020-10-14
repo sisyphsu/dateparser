@@ -413,6 +413,12 @@ public final class DateParser {
     }
 
     static CharArray buildInput(String str) {
+        if (str == null) {
+            throw new NullPointerException("str cannot be null");
+        }
+        if (str.length() == 0) {
+            throw new IllegalArgumentException("str cannot be empty");
+        }
         char[] chars = str.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             char ch = chars[i];
@@ -447,5 +453,5 @@ public final class DateParser {
         }
     }
 
-    private static int[] NSS = {100000000, 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1};
+    private static final int[] NSS = {100000000, 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1};
 }

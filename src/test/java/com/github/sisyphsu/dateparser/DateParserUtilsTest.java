@@ -244,4 +244,18 @@ public class DateParserUtilsTest {
         System.out.println("Output: " + dateFormat.format(date));
     }
 
+    @Test
+    public void testEmpty() {
+        try {
+            DateParserUtils.parseDate(null);
+        } catch (Exception e) {
+            assert e instanceof NullPointerException;
+        }
+        try {
+            DateParserUtils.parseDate("");
+        } catch (Exception e) {
+            assert e instanceof IllegalArgumentException;
+        }
+    }
+
 }
