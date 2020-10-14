@@ -221,7 +221,7 @@ public class DateParserUtilsTest {
             DateParser.newBuilder().addRule("(?<year>\\d{0})").build().parseDate("");
             assert false;
         } catch (Exception e) {
-            assert e instanceof DateTimeParseException;
+            assert e instanceof IllegalArgumentException;
         }
 
     }
