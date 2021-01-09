@@ -38,6 +38,20 @@ public class DateParserBuilderTest {
     }
 
     @Test
+    public void test2() {
+        String date = "September 2010";
+        DateParser parser = DateParser.newBuilder()
+                .addRule("(?<month>september)\\s{1,4}(?<year>\\d{4})")
+                .addRule("(?<month>\\w+)\\W+(?<year>\\d{4})")
+                .addRule("(?<month>\\w+)/(?<year>\\d{4})")
+                .build();
+
+        Calendar calendar = parser.parseCalendar(date.toLowerCase());
+        assert calendar.get(Calendar.MONTH) == Calendar.SEPTEMBER;
+        assert calendar.get(Calendar.YEAR) == 2010;
+    }
+
+    @Test
     public void testInvalidRule() {
         DateParser parser = DateParser.newBuilder().addRule("(?<invalid>\\d{3})").build();
         try {

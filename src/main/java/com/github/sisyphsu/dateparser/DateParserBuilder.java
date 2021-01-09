@@ -52,7 +52,7 @@ public final class DateParserBuilder {
             register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W+(?<year>\\d{4})\\b", month));
             register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W+(?<year>\\d{2})$", month));
             register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W+(?<year>\\d{2})[^:\\d]", month));
-            register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\W*", month));
+            register(String.format("(?<month>%s)\\W+(?<day>\\d{1,2})(?:th)?\\b", month));
 
             // month-word at middle, like '8th, may, 2009,' or '8th-may-09'
             register(String.format("(?<day>\\d{1,2})(?:th)?\\W+(?<month>%s)\\W+(?<year>\\d{4})\\b", month));
