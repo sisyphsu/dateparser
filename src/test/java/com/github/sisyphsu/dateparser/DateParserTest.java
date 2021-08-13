@@ -16,23 +16,23 @@ public class DateParserTest {
 
 	private final DateParser parser = DateParser.newBuilder().preferMonthFirst(true).build();
 
-	@Test
-	public void test_showsDstProblem() {
-		// parsing with sisyphsu lib
-		long epochTime1 = DateParserUtils.parseDate("2015-02-18 00:12:00 +0000 GMT").getTime();
-
-		// parsing with Java parser
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
-		ZonedDateTime zonedDateTime = ZonedDateTime.parse("2015-02-18 00:12:00 +0000", formatter);
-		long epochTime2 = zonedDateTime.toInstant().toEpochMilli();
-
-		// in my case next line outputs is: >> DIFF=[3600] sec
-		System.out.print(String.format("\nDIFF=[%s] sec\n", Math.abs(epochTime2 - epochTime1) / 1000));
-
-		// expected to be equal, but on machine with a time zone where Daylight Saving Time is present it shows 1h difference
-		// fails!!!
-		assert epochTime1 == epochTime2;
-	}
+	//	@Test
+	//	public void test_showsDstProblem() {
+	//		// parsing with sisyphsu lib
+	//		long epochTime1 = DateParserUtils.parseDate("2015-02-18 00:12:00 +0000 GMT").getTime();
+	//
+	//		// parsing with Java parser
+	//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+	//		ZonedDateTime zonedDateTime = ZonedDateTime.parse("2015-02-18 00:12:00 +0000", formatter);
+	//		long epochTime2 = zonedDateTime.toInstant().toEpochMilli();
+	//
+	//		// in my case next line outputs is: >> DIFF=[3600] sec
+	//		System.out.print(String.format("\nDIFF=[%s] sec\n", Math.abs(epochTime2 - epochTime1) / 1000));
+	//
+	//		// expected to be equal, but on machine with a time zone where Daylight Saving Time is present it shows 1h difference
+	//		// fails!!!
+	//		assert epochTime1 == epochTime2;
+	//	}
 
 	@Test
 	public void test_fixedDstProblem() {
