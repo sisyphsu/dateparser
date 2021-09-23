@@ -156,6 +156,10 @@ public class DateParserTest {
         assert match("yyyy-MM-dd HH:mm:ss.SSS Z", "2013-11-12 00:32:47.189 +0000", "1384216367189");
         assert match("yyyy-MM-dd HH:mm:ss.SSSSSS Z", "2013-11-12 00:32:47.111222 +0000", "1384216367111222");
         assert match("yyyy-MM-dd HH:mm:ss.SSSSSSSSS Z", "2013-11-12 00:32:47.111222333 +0000", "1384216367111222333");
+
+        // non-zero minutes negative time zone test
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2014-04-26 13:13:44 -0230", "2014-04-26 13:13:44 -02:30");
+        assert match("yyyy-MM-dd HH:mm:ss Z", "2014-04-26 13:13:44 -0930", "2014-04-26 13:13:44 -09:30");
     }
 
     private boolean match(String format, String datetime, String freeDatetime) {
