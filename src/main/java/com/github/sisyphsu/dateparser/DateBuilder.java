@@ -134,7 +134,7 @@ public final class DateBuilder {
         LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second, ns);
         // with ZoneOffset
         if (zoneOffsetSetted) {
-            ZoneOffset offset = ZoneOffset.ofHoursMinutes(zoneOffset / 60, Math.abs(zoneOffset % 60));
+            ZoneOffset offset = ZoneOffset.ofHoursMinutes(zoneOffset / 60, zoneOffset % 60);
             return dateTime.atOffset(offset);
         }
         // with TimeZone
