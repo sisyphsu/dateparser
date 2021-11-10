@@ -6,6 +6,8 @@ import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * @author sulin
@@ -162,6 +164,29 @@ public class DateParserTest {
         assert match("yyyy-MM-dd HH:mm:ss Z", "2014-04-26 13:13:44 -0930", "2014-04-26 13:13:44 -09:30");
     }
 
+    /**
+     * Test case for DateParser.parseDate(String) method.
+     * The test ensures that summer and winter date with/without zone information is correctly parsed in any possible
+     * time zone.
+     */
+    @Test
+    public void testParseDate() {
+        final TimeZone backUpTimeZone = TimeZone.getDefault();
+        try {
+            // run for all time zones to test expected behavior for any possible usage
+            for (String stzone : TimeZone.getAvailableIDs()) {
+                TimeZone.setDefault(TimeZone.getTimeZone(stzone));
+                assert matchParseDate("yyyy-MM-dd HH:mm:ss Z", "1970-12-07 00:00:00 +0000", "dec 7, 1970", false);
+                assert matchParseDate("yyyy-MM-dd HH:mm:ss Z", "1970-07-07 00:00:00 +0000", "jul 7, 1970", false);
+                assert matchParseDate("yyyy-MM-dd HH:mm:ss Z", "2006-07-02 15:04:05 -0700", "02 Jul 2006 15:04:05 -0700", true);
+                assert matchParseDate("yyyy-MM-dd HH:mm:ss Z", "2015-02-18 00:12:00 +0000", "2015-02-18 00:12:00 +0000 GMT", true);
+            }
+        }
+        finally {
+            TimeZone.setDefault(backUpTimeZone);
+        }
+    }
+
     private boolean match(String format, String datetime, String freeDatetime) {
         DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern(format).toFormatter();
         OffsetDateTime dt1 = OffsetDateTime.parse(datetime, formatter);
@@ -178,5 +203,28 @@ public class DateParserTest {
         return dt1.toEpochSecond() == dt2.toEpochSecond();
     }
 
+    /**
+     * Compare two dates with time zone parsed by java DateTimeFormatter and DateParser.parseDate(..).
+     * @param format reference date format
+     * @param datetime reference date
+     * @param freeDatetime tested date
+     * @param hasTimezone true when <code>freeDatetime</code> contains a time zone indication
+     * @return true if match, false otherwise
+     */
+    private boolean matchParseDate(String format, String datetime, String freeDatetime, boolean hasTimezone) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern(format).toFormatter();
+        OffsetDateTime dt1 = OffsetDateTime.parse(datetime, formatter);
+        Date d1 = Date.from(dt1.toInstant());
+        Date d2 = parser.parseDate(freeDatetime);
 
+        if (hasTimezone) {
+            return d1.equals(d2);
+        }
+        else {
+            // remove local time zone offset, to compare result as epoch time (UTC)
+            long offset = TimeZone.getDefault().getOffset(d2.getTime());
+            Date d3 = new Date(d2.getTime() + offset);
+            return d1.equals(d3);
+        }
+    }
 }
