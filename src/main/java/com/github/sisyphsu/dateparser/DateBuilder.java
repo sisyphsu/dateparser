@@ -65,10 +65,7 @@ public final class DateBuilder {
         if (!zoneOffsetSetted) {
             return toCalendar().getTime();
         }
-        LocalDateTime dateTime = toLocalDateTime();
-        long second = dateTime.toEpochSecond(DEFAULT_OFFSET);
-        long ns = dateTime.getNano();
-        return new Date(second * 1000 + ns / 1000000);
+        return Date.from(toOffsetDateTime().toInstant());
     }
 
     /**
