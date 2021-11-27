@@ -6,7 +6,7 @@
 
     <groupId>com.github.sisyphsu</groupId>
     <artifactId>dateparser</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 
     <name>dateparser</name>
     <url>https://github.com/sisyphsu/dateparser</url>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
+            <version>1.18.22</version>
             <scope>compile</scope>
         </dependency>
 
