@@ -247,7 +247,7 @@ public final class DateParser {
         if (a > 31 || b > 31 || a == 0 || b == 0 || (a > 12 && b > 12)) {
             throw error(from, "Invalid DayOrMonth at " + from);
         }
-        if (b > 12 || preferMonthFirst) {
+        if (b > 12 || (preferMonthFirst && a <= 12)) {
             dt.month = a;
             dt.day = b;
         } else {
