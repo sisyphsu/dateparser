@@ -2,6 +2,8 @@ package com.github.sisyphsu.dateparser;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -185,6 +187,20 @@ public class DateParserTest {
         finally {
             TimeZone.setDefault(backUpTimeZone);
         }
+    }
+
+    @Test
+    public void parseDate_returns_proper_date_for_US() {
+        DateParser dateParser = DateParser.newBuilder().build();
+        dateParser.setPreferMonthFirst(true); 
+        assertEquals("Thu Jan 16 00:00:00 IST 2020", dateParser.parseDate("01/16/2020").toString());
+    }
+
+    @Test
+    public void parseDate_returns_proper_date_for_US_MonthGT12() {
+        DateParser dateParser = DateParser.newBuilder().build();
+        dateParser.setPreferMonthFirst(true); 
+        assertEquals("Mon Mar 16 00:00:00 IST 2020", dateParser.parseDate("16/03/2020").toString());
     }
 
     private boolean match(String format, String datetime, String freeDatetime) {
