@@ -2,14 +2,14 @@ package com.github.sisyphsu.dateparser;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Date;
 import java.util.TimeZone;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author sulin
@@ -183,8 +183,7 @@ public class DateParserTest {
                 assert matchParseDate("yyyy-MM-dd HH:mm:ss Z", "2006-07-02 15:04:05 -0700", "02 Jul 2006 15:04:05 -0700", true);
                 assert matchParseDate("yyyy-MM-dd HH:mm:ss Z", "2015-02-18 00:12:00 +0000", "2015-02-18 00:12:00 +0000 GMT", true);
             }
-        }
-        finally {
+        } finally {
             TimeZone.setDefault(backUpTimeZone);
         }
     }
@@ -192,15 +191,15 @@ public class DateParserTest {
     @Test
     public void parseDate_returns_proper_date_for_US() {
         DateParser dateParser = DateParser.newBuilder().build();
-        dateParser.setPreferMonthFirst(true); 
-        assertEquals("Thu Jan 16 00:00:00 IST 2020", dateParser.parseDate("01/16/2020").toString());
+        dateParser.setPreferMonthFirst(true);
+        assertEquals(dateParser.parseDate("2020-01-16"), dateParser.parseDate("01/16/2020"));
     }
 
     @Test
     public void parseDate_returns_proper_date_for_US_MonthGT12() {
         DateParser dateParser = DateParser.newBuilder().build();
-        dateParser.setPreferMonthFirst(true); 
-        assertEquals("Mon Mar 16 00:00:00 IST 2020", dateParser.parseDate("16/03/2020").toString());
+        dateParser.setPreferMonthFirst(true);
+        assertEquals(dateParser.parseDate("2020-03-16"), dateParser.parseDate("16/03/2020"));
     }
 
     private boolean match(String format, String datetime, String freeDatetime) {
@@ -221,10 +220,11 @@ public class DateParserTest {
 
     /**
      * Compare two dates with time zone parsed by java DateTimeFormatter and DateParser.parseDate(..).
-     * @param format reference date format
-     * @param datetime reference date
+     *
+     * @param format       reference date format
+     * @param datetime     reference date
      * @param freeDatetime tested date
-     * @param hasTimezone true when <code>freeDatetime</code> contains a time zone indication
+     * @param hasTimezone  true when <code>freeDatetime</code> contains a time zone indication
      * @return true if match, false otherwise
      */
     private boolean matchParseDate(String format, String datetime, String freeDatetime, boolean hasTimezone) {
@@ -235,8 +235,7 @@ public class DateParserTest {
 
         if (hasTimezone) {
             return d1.equals(d2);
-        }
-        else {
+        } else {
             // remove local time zone offset, to compare result as epoch time (UTC)
             long offset = TimeZone.getDefault().getOffset(d2.getTime());
             Date d3 = new Date(d2.getTime() + offset);
