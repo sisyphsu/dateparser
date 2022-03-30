@@ -3,8 +3,6 @@
 [![Travis CI](https://travis-ci.org/sisyphsu/dateparser.svg?branch=master)](https://travis-ci.org/sisyphsu/dateparser)
 [![codecov](https://codecov.io/gh/sisyphsu/dateparser/branch/master/graph/badge.svg)](https://codecov.io/gh/sisyphsu/dateparser)
 
-[中文文档](https://sulin.me/2019/38Z4HAT.html)
-
 # Introduce
 
 `dateparser` is a smart and high-performance datetime parser library, it supports hundreds of different patterns. 
@@ -36,7 +34,7 @@ Add maven dependency:
 <dependency>
   <groupId>com.github.sisyphsu</groupId>
   <artifactId>dateparser</artifactId>
-  <version>1.0.9</version>
+  <version>1.0.10</version>
 </dependency>
 ```
 
