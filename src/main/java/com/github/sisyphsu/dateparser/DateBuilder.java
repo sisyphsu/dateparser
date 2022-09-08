@@ -105,7 +105,7 @@ public final class DateBuilder {
     LocalDateTime toLocalDateTime() {
         this.prepare();
         if (unixsecond > 0) {
-            return LocalDateTime.ofEpochSecond(unixsecond, ns, ZoneOffset.UTC);
+            return LocalDateTime.ofEpochSecond(unixsecond, ns, DEFAULT_OFFSET);
         }
         LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second, ns);
         int zoneSecond = 0;
