@@ -24,15 +24,20 @@ public class DateBuilderTest {
 
     @Test
     public void testTime() {
-        long second = System.currentTimeMillis() / 1000;
+        long epochSecond = Instant.now().getEpochSecond();
+        //  java official converter
+        //  https://stackoverflow.com/questions/35183146
+        Instant epochInstant = Instant.ofEpochSecond(epochSecond);
+        LocalDateTime officialDateTime = epochInstant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        //  dateParser converter
         DateBuilder builder = new DateBuilder();
-        builder.setUnixsecond(second);
+        builder.setUnixsecond(epochSecond);
         Date date = builder.toDate();
+        LocalDateTime dateParserDateTime = builder.toLocalDateTime();
 
         assert date.equals(new Date(builder.getUnixsecond() * 1000));
-
-        LocalDateTime dateTime = builder.toLocalDateTime();
-        assert dateTime.toEpochSecond(ZoneOffset.UTC) == second;
+        assert dateParserDateTime.equals(officialDateTime);
     }
 
     @Test
