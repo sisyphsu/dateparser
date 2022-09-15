@@ -23,7 +23,7 @@ public final class DateParserBuilder {
             "october",
             "november",
             "december",
-            "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
+            "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "sept", "oct", "nov", "dec",
     };
     static final String[] weeks = {
             "monday",
