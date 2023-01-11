@@ -4,7 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import java.time.*;
 import java.util.Date;
+import java.util.Random;
 import java.util.TimeZone;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author sulin
@@ -122,4 +125,23 @@ public class DateBuilderTest {
         assert date.getTime() == Long.valueOf(timestamp);
     }
 
+    @Test
+    public void testOptimizeForReuseSimilarFormatted(){
+        Random random = new Random(123456789l);
+        String[] inputs = new String[500000];
+        for (int i = 0; i < inputs.length; i++) {
+            inputs[i] = String.format("2020-0%d-1%d 00:%d%d:00 UTC",
+              random.nextInt(8) + 1,
+              random.nextInt(8) + 1,
+              random.nextInt(5),
+              random.nextInt(9));
+        }
+        DateParser regular = DateParser.newBuilder().build();
+        DateParser optimized = DateParser.newBuilder().optimizeForReuseSimilarFormatted(true).build();
+
+        for (int i = 0; i < inputs.length; i++) {
+            String input = inputs[i];
+            assertEquals(regular.parseDate(input), optimized.parseDate(input));
+        }
+    }
 }
