@@ -19,8 +19,14 @@ import java.util.*;
  */
 public final class DateParser {
 
+    private static final int MAXIMUM_NUMBER_OF_ERRORS = 10;
+
     private final ReMatcher matcher;
     private final DateBuilder dt = new DateBuilder();
+
+    private ReMatcher limitedRulesMatcher = null;
+    private final boolean optimizeForReuseSimilarFormatted;
+    private int encounteredErrorsCounter = 0;
 
     private final List<String> rules;
     private final Set<String> standardRules;
@@ -29,16 +35,17 @@ public final class DateParser {
     private String input;
     private boolean preferMonthFirst;
 
-    DateParser(List<String> rules, Set<String> stdRules, Map<String, RuleHandler> cstRules, boolean preferMonthFirst) {
+    DateParser(List<String> rules, Set<String> stdRules, Map<String, RuleHandler> cstRules, boolean preferMonthFirst, boolean optimizeForReuseSimilarFormatted) {
         this.rules = rules;
         this.standardRules = stdRules;
         this.customizedRuleMap = cstRules;
         this.preferMonthFirst = preferMonthFirst;
         this.matcher = new ReMatcher(this.rules.toArray(new String[0]));
+        this.optimizeForReuseSimilarFormatted = optimizeForReuseSimilarFormatted;
     }
 
     /**
-     * Create an new DateParserBuilder which could be used for initialize DateParser.
+     * Create a new DateParserBuilder which could be used for initialize DateParser.
      *
      * @return DateParserBuilder instance
      */
@@ -111,20 +118,67 @@ public final class DateParser {
      * Execute datetime's parsing
      */
     private void parse(final CharArray input) {
-        matcher.reset(input);
+        if (optimizeForReuseSimilarFormatted && encounteredErrorsCounter < MAXIMUM_NUMBER_OF_ERRORS) {
+            if (limitedRulesMatcher != null) {
+                //See if we can parse the input using the matcher which uses only a subset of the rules
+                try {
+                    parse(input, limitedRulesMatcher);
+                    return;
+                } catch (DateTimeParseException e) {
+                    dt.reset();
+                    encounteredErrorsCounter++;
+                }
+            } else {
+                //Find the rules that are needed to parse the input, and create a matcher with that subset of rules
+                matcher.reset(input);
+                int offset = 0;
+                int oldEnd = -1;
+                List<String> reducedAllRules = new ArrayList<>();
+                while (matcher.find(offset)) {
+                    if (oldEnd == matcher.end()) {
+                        encounteredErrorsCounter = MAXIMUM_NUMBER_OF_ERRORS;
+                        parse(input, matcher);
+                        return;
+                    }
+                    String usedRule = matcher.re();
+                    if (standardRules.contains(usedRule)) {
+                        reducedAllRules.add(usedRule);
+                    } else {
+                        reducedAllRules.add(usedRule);
+                    }
+                    offset = matcher.end();
+                    oldEnd = offset;
+                }
+                if (offset != input.length()) {
+                    encounteredErrorsCounter = MAXIMUM_NUMBER_OF_ERRORS;
+                    parse(input, matcher);
+                    return;
+                }
+                //At this point, we could parse the input meaning we found the relevant rules
+                //Store it for the next time
+                limitedRulesMatcher = new ReMatcher(reducedAllRules.toArray(new String[0]));
+            }
+            parse(input, matcher);
+        } else {
+            parse(input, matcher);
+        }
+    }
+
+    private void parse(final CharArray input, ReMatcher m) throws DateTimeParseException{
+        m.reset(input);
         int offset = 0;
         int oldEnd = -1;
-        while (matcher.find(offset)) {
-            if (oldEnd == matcher.end()) {
+        while (m.find(offset)) {
+            if (oldEnd == m.end()) {
                 throw error(offset, "empty matching at " + offset);
             }
-            if (standardRules.contains(matcher.re())) {
-                this.parseStandard(input, offset);
+            if (standardRules.contains(m.re())) {
+                this.parseStandard(input, offset, m);
             } else {
-                RuleHandler handler = customizedRuleMap.get(matcher.re());
-                handler.handle(input, matcher, dt);
+                RuleHandler handler = customizedRuleMap.get(m.re());
+                handler.handle(input, m, dt);
             }
-            offset = matcher.end();
+            offset = m.end();
             oldEnd = offset;
         }
         if (offset != input.length()) {
@@ -135,13 +189,13 @@ public final class DateParser {
     /**
      * Parse datetime use standard rules.
      */
-    void parseStandard(CharArray input, int offset) {
-        for (int index = 1; index <= matcher.groupCount(); index++) {
-            final String groupName = matcher.groupName(index);
-            final int startOff = matcher.start(index);
-            final int endOff = matcher.end(index);
+    void parseStandard(CharArray input, int offset, ReMatcher m) {
+        for (int index = 1; index <= m.groupCount(); index++) {
+            final String groupName = m.groupName(index);
+            final int startOff = m.start(index);
+            final int endOff = m.end(index);
             if (groupName == null) {
-                throw error(offset, "Hit invalid standard rule: " + matcher.re());
+                throw error(offset, "Hit invalid standard rule: " + m.re());
             }
             if (startOff == -1 && endOff == -1) {
                 continue;
@@ -226,13 +280,13 @@ public final class DateParser {
                     dt.ns = parseNum(input, endOff - 9, endOff);
                     break;
                 default:
-                    throw error(offset, "Hit invalid standard rule: " + matcher.re());
+                    throw error(offset, "Hit invalid standard rule: " + m.re());
             }
         }
     }
 
     /**
-     * Parse an subsequence which represent dd/mm or mm/dd, it should be more smart for different locales.
+     * Parse a subsequence which represent dd/mm or mm/dd, it should be more smart for different locales.
      */
     void parseDayOrMonth(CharArray input, int from, int to) {
         char next = input.data[from + 1];
@@ -257,7 +311,7 @@ public final class DateParser {
     }
 
     /**
-     * Parse an subsequence which represent year, like '2019', '19' etc
+     * Parse a subsequence which represent year, like '2019', '19' etc
      */
     int parseYear(CharArray input, int from, int to) {
         switch (to - from) {
@@ -274,7 +328,7 @@ public final class DateParser {
     }
 
     /**
-     * Parse an subsequence which represent the offset of timezone, like '+0800', '+08', '+8:00', '+08:00' etc
+     * Parse a subsequence which represent the offset of timezone, like '+0800', '+08', '+8:00', '+08:00' etc
      */
     int parseZoneOffset(CharArray input, int from, int to) {
         boolean neg = input.data[from] == '-';
@@ -301,7 +355,7 @@ public final class DateParser {
     }
 
     /**
-     * Parse an subsequence which suffix second, like '.2000', '.3186369', '.257000000' etc
+     * Parse a subsequence which suffix second, like '.2000', '.3186369', '.257000000' etc
      * It should be treated as ms/us/ns.
      */
     int parseNano(CharArray input, int from, int to) {
@@ -314,7 +368,7 @@ public final class DateParser {
     }
 
     /**
-     * Parse an subsequence which represent week, like 'Monday', 'mon' etc
+     * Parse a subsequence which represent week, like 'Monday', 'mon' etc
      */
     int parseWeek(CharArray input, int from) {
         switch (input.data[from]) {
@@ -345,7 +399,7 @@ public final class DateParser {
     }
 
     /**
-     * Parse an subsequence which represent month, like '12', 'Feb' etc
+     * Parse a subsequence which represent month, like '12', 'Feb' etc
      */
     int parseMonth(CharArray input, int from, int to) {
         if (to - from <= 2) {

@@ -145,6 +145,8 @@ public final class DateParserBuilder {
     }
 
     private boolean preferMonthFirst = false;
+    private boolean optimizeForReuseSimilarFormatted = false;
+
     private final List<String> rules = new ArrayList<>();
     private final Set<String> standardRules = new HashSet<>();
     private final Map<String, RuleHandler> customizedRuleMap = new HashMap<>();
@@ -156,6 +158,18 @@ public final class DateParserBuilder {
         // predefined customized rules
         this.rules.addAll(DateParserBuilder.CUSTOMIZED_RULES);
         this.customizedRuleMap.putAll(DateParserBuilder.CUSTOMIZED_RULE_MAP);
+    }
+
+    /**
+     * Set to {@code true} when the parser will be used to parse many date strings which all use the same format.
+     * An example use-case is parsing a timestamp column from a large CSV file.
+     *
+     * @param optimizeForReuseSimilarFormatted True means creating a parser optimized to parse many date strings in the same format.
+     * @return This
+     */
+    public DateParserBuilder optimizeForReuseSimilarFormatted(boolean optimizeForReuseSimilarFormatted){
+        this.optimizeForReuseSimilarFormatted = optimizeForReuseSimilarFormatted;
+        return this;
     }
 
     /**
@@ -204,7 +218,7 @@ public final class DateParserBuilder {
      * @return DateParser
      */
     public DateParser build() {
-        return new DateParser(rules, standardRules, customizedRuleMap, preferMonthFirst);
+        return new DateParser(rules, standardRules, customizedRuleMap, preferMonthFirst, optimizeForReuseSimilarFormatted);
     }
 
 }
