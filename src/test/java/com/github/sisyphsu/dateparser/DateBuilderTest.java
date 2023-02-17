@@ -148,5 +148,13 @@ public class DateBuilderTest {
             String input = inputs[i];
             assertEquals(regular.parseDate(input), optimized.parseDate(input));
         }
+
+        //Now check if the parser can still deal with a date in a different format
+        String inputInDifferentFormat = String.format("1%d/0%d/2020 00:%d%d:00 UTC",
+          random.nextInt(8) + 1,
+          random.nextInt(8) + 1,
+          random.nextInt(5),
+          random.nextInt(9));
+        assertEquals(regular.parseDate(inputInDifferentFormat), optimized.parseDate(inputInDifferentFormat));
     }
 }

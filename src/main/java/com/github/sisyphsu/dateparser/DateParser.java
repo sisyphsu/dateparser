@@ -118,46 +118,52 @@ public final class DateParser {
      * Execute datetime's parsing
      */
     private void parse(final CharArray input) {
+        // When the optimizeForReuseSimilarFormatted flag is set, we assume that the parser is
+        // used for multiple input strings in the same format
+        // * Remember which rules were used to parse the first input string
+        // * When parsing the second string, first try with the same rules as for the first input string
+        //   * If this succeeds, we have a performance gain
+        //   * If this fails, increment an error counter, and parse instead with all the rules
+        // * If the error counter passes a threshold, stop trying to parse input strings with the rules from the first string
+        //   and fall back to the regular parsing code path that uses all the rules.
+        //   The input strings were clearly not formatted in the same way
         if (optimizeForReuseSimilarFormatted && encounteredErrorsCounter < MAXIMUM_NUMBER_OF_ERRORS) {
             if (limitedRulesMatcher != null) {
-                //See if we can parse the input using the matcher which uses only a subset of the rules
                 try {
                     parse(input, limitedRulesMatcher);
-                    return;
                 } catch (DateTimeParseException e) {
                     dt.reset();
                     encounteredErrorsCounter++;
+                    //Parsing with our subset of rules failed, so fall back to the matcher which uses all the rules
+                    parse(input, matcher);
                 }
-            } else {
-                //Find the rules that are needed to parse the input, and create a matcher with that subset of rules
-                matcher.reset(input);
-                int offset = 0;
-                int oldEnd = -1;
-                List<String> reducedAllRules = new ArrayList<>();
-                while (matcher.find(offset)) {
-                    if (oldEnd == matcher.end()) {
-                        encounteredErrorsCounter = MAXIMUM_NUMBER_OF_ERRORS;
-                        parse(input, matcher);
-                        return;
-                    }
-                    String usedRule = matcher.re();
-                    if (standardRules.contains(usedRule)) {
-                        reducedAllRules.add(usedRule);
-                    } else {
-                        reducedAllRules.add(usedRule);
-                    }
-                    offset = matcher.end();
-                    oldEnd = offset;
-                }
-                if (offset != input.length()) {
+                return;
+            }
+            //Find the rules that are needed to parse the input, and create a matcher with that subset of rules
+            matcher.reset(input);
+            int offset = 0;
+            int oldEnd = -1;
+            List<String> reducedAllRules = new ArrayList<>();
+            while (matcher.find(offset)) {
+                if (oldEnd == matcher.end()) {
                     encounteredErrorsCounter = MAXIMUM_NUMBER_OF_ERRORS;
                     parse(input, matcher);
                     return;
                 }
-                //At this point, we could parse the input meaning we found the relevant rules
-                //Store it for the next time
-                limitedRulesMatcher = new ReMatcher(reducedAllRules.toArray(new String[0]));
+                String usedRule = matcher.re();
+                reducedAllRules.add(usedRule);
+                offset = matcher.end();
+                oldEnd = offset;
             }
+            if (offset != input.length()) {
+                encounteredErrorsCounter = MAXIMUM_NUMBER_OF_ERRORS;
+                parse(input, matcher);
+                return;
+            }
+            //At this point, we could parse the input meaning we found the relevant rules
+            //Store it for the next time
+            limitedRulesMatcher = new ReMatcher(reducedAllRules.toArray(new String[0]));
+
             parse(input, matcher);
         } else {
             parse(input, matcher);
