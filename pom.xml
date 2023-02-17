@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.sisyphsu</groupId>
-    <artifactId>dateparser-xyzt-ai</artifactId>
+    <artifactId>dateparser</artifactId>
     <version>1.0.11</version>
 
     <name>dateparser</name>
